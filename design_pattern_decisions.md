@@ -6,16 +6,16 @@ The project implements a "Circuit Breaker / Emergency Stop" for the *Manifestati
 This pattern is tested in [manifestations.test.js](test/manifestations_pausable.test.js)
 
 Moreover, a pattern similar to "Automatic Deprecation" has been implemented for the registered manifestations. This way, if a
-user registers manifestations but does not provide evidences, the manifestations expire after a given amount of time fixed during
+user registers manifestations but does not provide evidence, the manifestations expire after a given amount of time fixed during
 deployment o the *Manifestations* contract. Expiration in this case means that the manifestation can be overwritten by another user.
 
 This pattern is implemented as a library in [ExpirableLib](contracts/ExpirableLib.sol), to facilitate its reuse. 
 It has been tested in [manifestations_expirable.test.js](test/manifestations_expirable.test.js)
 
 Overall, the contracts have been designed favouring modularity and reusability. Thus, the previous expiration functionality has been
-implemented as a Solidity Library. There is also the "evidencable" functionality, that makes a item capable of accumulating evidences
+implemented as a Solidity Library. There is also the "evidencable" functionality, that makes a item capable of accumulating evidence
 supporting it, that has been implemented using a Solidity contract [Evidencable](contracts/Evidencable.sol). This facilitates
-making manifestations capable of accumulating evidences supporting them, but also reusing this same behaviour for complaints. Moreover,
+making manifestations capable of accumulating evidence supporting them, but also reusing this same behaviour for complaints. Moreover,
 making this functionality available as a library reduces deployment costs.
 
 ### Architecture Overview

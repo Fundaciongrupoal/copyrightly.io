@@ -108,7 +108,7 @@ export class UploadEvidencesContractService {
         .catch(error => {
           console.log(error);
           this.ngZone.run(() => {
-            observer.error(new Error('Error listening manifestation evidences, see log for details'));
+            observer.error(new Error('Error listing manifestation\'s evidence, see log for details'));
             observer.complete();
           });
         });

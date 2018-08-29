@@ -78,8 +78,8 @@ The functionality provided to the users by the ÐApp through its Web application
    * Scenario: List own manifestations when I have one
 
 4. View Manifestation Details (*pending e2e tests*)
-   * Scenario: Detail manifestation without evidences
-   * Scenario: Detail manifestation with evidences
+   * Scenario: Detail manifestation without evidence
+   * Scenario: Detail manifestation with evidence
   
 5. Add Uploadable Evidence to Manifestation (*pending e2e tests*)
    * Scenario: Add unused uploadable evidence
@@ -284,27 +284,27 @@ The tests check that re-registration is possible just after more than 2 seconds,
 ```
   Contract: Manifestations - Expirable
     ✓ should re-register just when already expired (3266ms)
-    ✓ shouldn't expire if manifestation with evidences (3138ms)
+    ✓ shouldn't expire if manifestation with evidence (3138ms)
 ```
 
 ### UploadEvidences Contract
 
 Source: [UploadEvidences.sol](contracts/UploadEvidences.sol)
 
-This contract implements the registration of evidences based on uploading content to IPFS. It behaves as an
+This contract implements the registration of evidence based on uploading content to IPFS. It behaves as an
 evidence provider for the contract specified when adding the evidence. However, the contract has to be registered
 as and allowed evidence provider, in the case of these tests in the *Manifestations* contract.
 
-Multiple evidences should be accumulated for the same manifestation, but just if they are new ones and if the
-manifestation they are evidences for exists. Finally, only the owner of *Manifestations* can register
+Multiple evidence should be accumulated for the same manifestation, but just if they are new ones and if the
+manifestation they are evidence for exists. Finally, only the owner of *Manifestations* can register
 evidence providers. It is tested that just the owner of *Manifestations* can register a new provider that
-then can add evidences as usual.
+then can add evidence as usual.
 
 [uploadevidences.test.js](test/uploadevidences.test.js)
 ```
-  Contract: UploadEvidences - Manifestations accumulate evidences
+  Contract: UploadEvidences - Manifestations accumulate evidence
     ✓ should add evidence if registered evidence provider (220ms)
-    ✓ should add multiple evidences for the same manifestation (124ms)
+    ✓ should add multiple evidence for the same manifestation (124ms)
     ✓ shouldn't add the same evidence for the same manifestation (116ms)
     ✓ shouldn't add the same evidence for a different manifestation (142ms)
     ✓ shouldn't add evidence if the manifestation does not exists (522ms)
@@ -349,10 +349,10 @@ manifestations (or complaints) can expire after a certain amount of time. It is 
 
 Source: [Evidencable.sol](contracts/Evidencable.sol)
 
-This is a contract that provides the logic for items that can accumulate evidences. Manifestations (or complaints)
-can receive evidences by extending this contract. 
+This is a contract that provides the logic for items that can accumulate evidence. Manifestations (or complaints)
+can receive evidence by extending this contract. 
 
-The idea is that evidences are considered by curators to check the appropriateness of manifestations (and complaints).
+The idea is that evidence is considered by curators to check the appropriateness of manifestations (and complaints).
 Moreover, they are counted so manifestations (or complaints) that have accumulated at least one evidence do not expire,
 as tested for **Manifestations** in: [manifestations_expirable.test.js](test/manifestations_expirable.test.js)
 
@@ -401,7 +401,7 @@ Users are offered the option of keeping content private, so it is not uploaded t
 content hash is generated. It can be later used as a proof of having the digital file so users are
 recommended to keep the same exact file they used to generate the hash.
 
-The same is done for evidences based on uploading content to IPFS, that then becomes available for inspect.
+The same is done for evidence based on uploading content to IPFS, that then becomes available for inspection.
 
 In both cases the user interface provide links to IPFS to retrieve the uploaded content.
 

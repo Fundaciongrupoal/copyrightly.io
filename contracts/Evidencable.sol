@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-/// @title Library to implement items that can accumulate evidences
+/// @title Library to implement items that can accumulate evidence
 /// @author Roberto García (http://rhizomik.net/~roberto/)
 contract Evidencable is Ownable {
     using SafeMath for uint8;
@@ -31,14 +31,14 @@ contract Evidencable is Ownable {
     }
 
     /// @notice Adds an evidence provider `provider` contract that can then call addEvidence(...)
-    /// to add evidences.
-    /// @param provider The address of a contract providing evidences
+    /// to add evidence.
+    /// @param provider The address of a contract providing evidence
     function addEvidenceProvider(address provider) public onlyOwner {
         evidenceProviders[provider] = true;
     }
 
-    /// @notice Check if the `self` Evidentiality struct has no evidences yet.
-    /// @dev Used to check if the corresponding item evidences count is 0.
+    /// @notice Check if the evidencable `hash` has no evidence yet.
+    /// @dev Used to check if the corresponding item evidence count is 0.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
     function isUnevidenced(string hash) internal constant returns(bool) {
         return (evidenceCounts[hash] == 0);

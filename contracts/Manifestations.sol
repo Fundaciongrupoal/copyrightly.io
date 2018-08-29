@@ -43,7 +43,7 @@ contract Manifestations is Pausable, Initializable, Evidencable {
         require(bytes(title).length > 0, "A title is required");
         require(manifestations[hash].authors.length == 0 ||
                 (manifestations[hash].time.isExpired() && isUnevidenced(hash)),
-            "Already registered and not expired or with evidences");
+            "Already registered and not expired or with evidence");
         _;
         manifestations[hash].title = title;
         manifestations[hash].time.setExpiry(timeToExpiry);

@@ -65,7 +65,7 @@ contract('Manifestations - Expirable', function (accounts) {
       'manifestation time not properly updated');
   });
 
-  it("shouldn't expire if manifestation with evidences", async () => {
+  it("shouldn't expire if manifestation with evidence", async () => {
     const evidences = await UploadEvidences.deployed();
     manifestations.addEvidenceProvider(evidences.address);
 

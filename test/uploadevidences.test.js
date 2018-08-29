@@ -4,7 +4,7 @@ const Proxy = artifacts.require("AdminUpgradeabilityProxy");
 
 const web3 = require('web3');
 
-contract('UploadEvidences - Manifestations accumulate evidences', function (accounts) {
+contract('UploadEvidences - Manifestations accumulate evidence', function (accounts) {
 
   const OWNER = accounts[0];
   const NOT_OWNER = accounts[1];
@@ -58,7 +58,7 @@ contract('UploadEvidences - Manifestations accumulate evidences', function (acco
         'the account providing the evidence should be the same than the manifester');
   });
 
-  it("should add multiple evidences for the same manifestation", async () => {
+  it("should add multiple evidence for the same manifestation", async () => {
     let eventEmitted = false;
     const event = evidences.UploadEvidenceEvent();
     await event.watch((error, result) => {
@@ -74,7 +74,7 @@ contract('UploadEvidences - Manifestations accumulate evidences', function (acco
     const evidenceCount = await manifestations.getEvidenceCount(HASH1);
 
     assert.equal(evidenceCount, 2,
-      'The manifestation should accumulate 2 evidences');
+      'The manifestation should accumulate 2 evidence');
     assert.equal(eventEmitted, true,
       'Registering an uploadable evidence should emit an UploadableEvidenceEvent');
     assert.equal(registry, manifestations.address,
@@ -103,7 +103,7 @@ contract('UploadEvidences - Manifestations accumulate evidences', function (acco
     const evidenceCount = await manifestations.getEvidenceCount(HASH1);
 
     assert.equal(evidenceCount, 2,
-      'The manifestation should accumulate 3 evidences');
+      'The manifestation should accumulate 3 evidence');
     assert.equal(eventEmitted, false,
       'Registering the same evidence should not emit an UploadableEvidenceEvent');
   });
@@ -149,7 +149,7 @@ contract('UploadEvidences - Manifestations accumulate evidences', function (acco
     const evidenceCount = await manifestations.getEvidenceCount(HASH1);
 
     assert.equal(evidenceCount, 2,
-      'The manifestation should accumulate 3 evidences');
+      'The manifestation should accumulate 3 evidence');
     assert.equal(eventEmitted, false,
       'No evidence if not registered evidence provider so no UploadableEvidenceEvent');
   });
@@ -173,7 +173,7 @@ contract('UploadEvidences - Manifestations accumulate evidences', function (acco
     const evidenceCount = await manifestations.getEvidenceCount(HASH3);
 
     assert.equal(evidenceCount, 0,
-      'An unexisting manifestation should not accumulate evidences');
+      'An unexisting manifestation should not accumulate evidence');
     assert.equal(eventEmitted, false,
       'No evidence if the manifestation does not exist, so no UploadableEvidenceEvent');
   });

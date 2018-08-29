@@ -36,21 +36,21 @@ export class ManifestationDetailsComponent implements OnInit, OnDestroy {
       this.manifestationsContractService.getManifestation(params.get('id'))))
     .subscribe((manifestation: Manifestation) => {
       this.manifestation = manifestation;
-      this.loadEvidences();
+      this.loadEvidence();
     });
   }
 
-  loadEvidences(): void {
+  loadEvidence(): void {
     this.uploadEvidencesContractService.listManifestationEvidences(this.manifestation.hash)
     .subscribe((evidences: UploadEvidenceEvent[]) => {
       this.evidences = evidences;
     }, error => this.alertsService.error(error));
 
-    // Reload evidences if page reloaded
+    // Reload evidence if page reloaded
     this.navigationSubscription = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
         this.navigationSubscription.unsubscribe();
-        this.loadEvidences();
+        this.loadEvidence();
       }
     });
   }

@@ -19,7 +19,7 @@
       <p class="card-text">{{manifestation?.when | date:'medium'}}</p>
     </div>
     <div class="col-md-1 p-1 mb-1">
-      <h6 class="card-subtitle text-muted">Evidences</h6>
+      <h6 class="card-subtitle text-muted">Evidence</h6>
       <p class="card-text">{{evidences?.length}}</p>
     </div>
   </div>
@@ -27,7 +27,7 @@
 
 <button class="btn btn-secondary mb-4" (click)="back()">Back</button>
 
-<h3>Authorship Evidences</h3>
+<h3>Authorship Evidence</h3>
 
 <button *ngIf="!addingEvidence" type="button" class="btn btn-success mb-4"
         (click)="addingEvidence = true">Add Evidence</button>
@@ -38,9 +38,9 @@
 
 <div *ngIf="evidences?.length == 0 && !addingEvidence" class="card mb-4">
   <div class="card-block row m-1">
-    <h5 class="card-title col-md-12 p-1">No evidences yet</h5>
+    <h5 class="card-title col-md-12 p-1">No evidence yet</h5>
     <p class="card-text col-md-12 p-1 alert-danger">Warning! This manifestation can be overwritten if no
-      evidences are provided before {{manifestation?.expiry | date:'medium'}}</p>
+      evidence is provided before {{manifestation?.expiry | date:'medium'}}</p>
   </div>
 </div>
 
