@@ -17,12 +17,12 @@ contract YouTubeEvidences is usingOraclize {
         bool isVerified;
     }
 
-    event OraclizeQuery(string query);
+    event OraclizeQuery(bytes32 evidenceId);
+
     event YouTubeEvidenceEvent(bytes32 evidenceId, bytes32 indexed evidencedIdHash, string videoId);
 
-    constructor() public {
-        // Just for local testing:
-        // OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
+    constructor(uint gasPrice) public {
+        oraclize_setCustomGasPrice(gasPrice);
     }
 
     /// @notice Callback for the oracle for query `evidenceId` including the `properLinksCount
@@ -33,14 +33,15 @@ contract YouTubeEvidences is usingOraclize {
     function __callback(bytes32 evidenceId, string properLinksCount) public {
         require(msg.sender == oraclize_cbAddress());
         require(evidences[evidenceId].isPending);
+        evidences[evidenceId].isPending = false;
+
         if (parseInt(properLinksCount) > 0) {
-            evidences[evidenceId].isVerified = true;
             Evidencable(evidences[evidenceId].registry)
                 .addEvidence(evidences[evidenceId].evidencedId);
+            evidences[evidenceId].isVerified = true;
             emit YouTubeEvidenceEvent(evidenceId, keccak256(evidences[evidenceId].evidencedId),
                 evidences[evidenceId].videoId);
         }
-        evidences[evidenceId].isPending = false;
     }
 
     /// @notice Check using an oracle if the YouTube `videoId` is linked to the manifestation `hash`.
@@ -49,11 +50,15 @@ contract YouTubeEvidences is usingOraclize {
     /// @param registry The address of the contract holding the items evidenced
     /// @param evidencedId The identifier used by the registry contract for the item receiving evidence
     /// @param videoId The identifier of a YouTube video to be checked
-    function check(address registry, string evidencedId, string videoId) public payable returns (bytes32) {
-        require(oraclize_getPrice("URL") > address(this).balance, "Not enough funds to run Oraclize query");
+    function check(address registry, string evidencedId, string videoId, uint gaslimit) public payable {
+        require(address(this).balance >= oraclize_getPrice("URL", gaslimit), "Not enough funds to run Oraclize query");
         string memory query = strConcat(HTML, videoId, XPATH, evidencedId, "')]))");
-        bytes32 evidenceId = oraclize_query("URL", query);
+        bytes32 evidenceId = oraclize_query("URL", query, gaslimit);
         evidences[evidenceId] = YouTubeEvidence(registry, evidencedId, videoId, true, false);
-        return evidenceId;
+        emit OraclizeQuery(evidenceId);
+    }
+
+    function getPrice(uint gaslimit) public constant returns (uint) {
+        return oraclize_getPrice("URL", gaslimit);
     }
 }

@@ -436,10 +436,9 @@ Thus, the Oracle allows a creator to assert that a manifestation is also availab
 the same person, who should have access to edit the description of the video to include the link to the manifestation
 using its hash.
 
-The tests for this contract are currently disabled as it has not been possible to make Oraclize work in the 
-Ganache test network, even after installing the [ethereum-bridge](https://github.com/oraclize/ethereum-bridge) 
-as recommended in the Oraclize documentation. The tests are available from 
-[youtubeevidences.test.js](test/youtubeevidences.test.js.disabled)
+The tests for this contract are possible in the Ganache test network are possible using the 
+[ethereum-bridge](https://github.com/oraclize/ethereum-bridge) as recommended in the Oraclize documentation. 
+The tests are available from [youtubeevidences.test.js](test/youtubeevidences.test.js)
 
 It also possible to test the Oraclize query online at: http://app.oraclize.it/home/test_query
 

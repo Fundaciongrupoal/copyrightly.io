@@ -34,6 +34,7 @@ before_script:
 script:
   - npm run lint
   - npm run network > /dev/null &
+  - npm run ethereum-bridge > /dev/null &
   - npm run migrate
   - npm run soltest
   - npm run e2e

@@ -8,7 +8,8 @@ const YouTubeEvidences = artifacts.require("./YouTubeEvidences.sol");
 module.exports = async function(deployer, network, accounts) {
   const owner = accounts[0];
   const proxyAdmin = accounts[1];
-  const timeToExpiry = 60 * 60 * 24;
+  const timeToExpiry = 60 * 60 * 24;  // 24h
+  const customGasPrice = 10000000000; // 10 GWei
 
   deployer.then(async () => {
     await deployer.deploy(SafeMath);
@@ -18,7 +19,7 @@ module.exports = async function(deployer, network, accounts) {
     await deployer.deploy(Manifestations, timeToExpiry);
     await deployer.deploy(Proxy, Manifestations.address, {from: proxyAdmin});
     await deployer.deploy(UploadEvidences);
-    await deployer.deploy(YouTubeEvidences);
+    await deployer.deploy(YouTubeEvidences, customGasPrice);
 
     const manifestations = await Manifestations.deployed();
     const proxy = await Proxy.deployed();
