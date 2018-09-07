@@ -11,7 +11,7 @@ addons:
 
 branches:
   only:
-  - master
+  - development
 
 cache:
   directories:
@@ -42,10 +42,10 @@ script:
   - npm run build
 
 after_success:
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "development" ]; then
       docker login -u $DOCKER_USER -p $DOCKER_PASS;
       export REPO=rogargon/copyrightly-io;
-      export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`;
+      export TAG=`if [ "$TRAVIS_BRANCH" == "development" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`;
       docker build -f Dockerfile -t $REPO:$TRAVIS_COMMIT .;
       docker tag $REPO:$TRAVIS_COMMIT $REPO:$TAG;
       docker push $REPO;
