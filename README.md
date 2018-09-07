@@ -5,7 +5,8 @@ Decentralized Application (ÐApp) for Copyright Management
 [![Build Status](https://travis-ci.org/rogargon/copyrightly.io.svg?branch=master)](https://travis-ci.org/rogargon/copyrightly.io)
 
 CopyrightLY smart contracts allow content owners to register their works as what is called a 
-[Manifestation](https://github.com/rhizomik/copyrightonto/tree/master/ActionsModel#overview).
+[Manifestation](https://github.com/rhizomik/copyrightonto/tree/master/ActionsModel#overview), as modelled in the 
+[Copyright Ontology](https://github.com/rhizomik/copyrightonto).
 
 **Manifestations** are expressions of authors ideas into pieces of content that can be then used to prove authorship.
 This is done through the [Manifestations](contracts/Manifestations.sol) contract, which records
