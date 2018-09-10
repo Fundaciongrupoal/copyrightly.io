@@ -32,7 +32,7 @@ export class ManifestSingleComponent implements OnInit {
 
   loadFile(event) {
     if (event.files.length > 0) {
-      this.status = 'Uploading...';
+      this.status = 'Loading...';
       this.ipfsService.uploadFile(event.files[0], this.uploadToIpfs)
       .subscribe((hash: string) => {
         this.status = 'Register';

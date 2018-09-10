@@ -9,6 +9,8 @@ import { Manifestation } from '../manifestation';
 import { UploadEvidenceEvent } from '../../evidences/upload-evidence-event';
 import { UploadEvidencesContractService } from '../../evidences/upload-evidences-contract.service';
 import { Location } from '@angular/common';
+import { YouTubeEvidenceEvent } from '../../evidences/youtube-evidence-event';
+import { YouTubeEvidencesContractService } from '../../evidences/youtube-evidences-contract.service';
 
 @Component({
   selector: 'app-manifestation-details',
@@ -18,8 +20,10 @@ import { Location } from '@angular/common';
 export class ManifestationDetailsComponent implements OnInit, OnDestroy {
 
   manifestation: Manifestation;
-  evidences: UploadEvidenceEvent[];
-  addingEvidence = false;
+  uploadEvidenceEvents: UploadEvidenceEvent[];
+  youTubeEvidenceEvents: YouTubeEvidenceEvent[];
+  addingUploadableEvidence = false;
+  addingYouTubeEvidence = false;
   navigationSubscription: Subscription;
 
   constructor(private route: ActivatedRoute,
@@ -28,6 +32,7 @@ export class ManifestationDetailsComponent implements OnInit, OnDestroy {
               private web3Service: Web3Service,
               private manifestationsContractService: ManifestationsContractService,
               private uploadEvidencesContractService: UploadEvidencesContractService,
+              private youTubeEvidencesContractService: YouTubeEvidencesContractService,
               private alertsService: AlertsService) {}
 
   ngOnInit(): void {
@@ -40,10 +45,18 @@ export class ManifestationDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  addingEvidence(): boolean {
+    return this.addingUploadableEvidence || this.addingYouTubeEvidence;
+  }
+
   loadEvidence(): void {
     this.uploadEvidencesContractService.listManifestationEvidences(this.manifestation.hash)
     .subscribe((evidences: UploadEvidenceEvent[]) => {
-      this.evidences = evidences;
+      this.uploadEvidenceEvents = evidences;
+    }, error => this.alertsService.error(error));
+    this.youTubeEvidencesContractService.listManifestationEvidences(this.manifestation.hash)
+    .subscribe((evidences: YouTubeEvidenceEvent[]) => {
+      this.youTubeEvidenceEvents = evidences;
     }, error => this.alertsService.error(error));
 
     // Reload evidence if page reloaded

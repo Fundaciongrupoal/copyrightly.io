@@ -7,6 +7,9 @@ import { Web3Service } from './util/web3.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { AuthenticationService } from './navbar/authentication.service';
 import { ManifestEventComponent } from './manifestations/manifest-event.component';
+import { YouTubeEvidencesContractService } from './evidences/youtube-evidences-contract.service';
+import { YouTubeEvidenceEvent } from './evidences/youtube-evidence-event';
+import { YouTubeEvidenceEventComponent } from './evidences/youtube-evidence-event.component';
 
 @Component({
   selector: 'app-root',
@@ -18,12 +21,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private web3Service: Web3Service,
               private manifestationsContractService: ManifestationsContractService,
+              private youTubeEvidencesContractService: YouTubeEvidencesContractService,
               private authenticationService: AuthenticationService,
               private alertsService: AlertsService) {}
 
   ngOnInit(): void {
-    // this.watchManifestEvents();
-    // TODO: Disabled because not working with current MetaMask and Web3 1.0, using events in tx receipt instead
+    // this.watchManifestEvents(); TODO: Disabled because not working with current MetaMask and Web3 1.0, using events in tx receipt instead
+    this.watchYouTubeEvidenceEvents();
   }
 
   watchManifestEvents() {
@@ -37,6 +41,19 @@ export class AppComponent implements OnInit, OnDestroy {
       }, error => {
         this.alertsService.error(error);
       });
+  }
+
+  watchYouTubeEvidenceEvents() {
+    this.authenticationService.getSelectedAccount()
+    .pipe(takeUntil(this.ngUnsubscribe))
+    .pipe(filter(account => account !== ''))
+    .pipe(flatMap((account: string) => this.youTubeEvidencesContractService.watchEvidenceEvents(account)))
+    .subscribe( (event: YouTubeEvidenceEvent) => {
+      console.log(event);
+      this.alertsService.modal(YouTubeEvidenceEventComponent, event);
+    }, error => {
+      this.alertsService.error(error);
+    });
   }
 
   ngOnDestroy(): void {
