@@ -11,6 +11,7 @@ contract YouTubeEvidences is usingOraclize {
 
     struct YouTubeEvidence {
         address registry;
+        address evidencer;
         string evidencedId;
         string videoId;
         bool isPending;
@@ -19,7 +20,8 @@ contract YouTubeEvidences is usingOraclize {
 
     event OraclizeQuery(bytes32 evidenceId);
 
-    event YouTubeEvidenceEvent(bytes32 evidenceId, bytes32 indexed evidencedIdHash, string videoId);
+    event YouTubeEvidenceEvent(bytes32 evidenceId, bytes32 indexed evidencedIdHash,
+        string videoId, address indexed evidencer);
 
     constructor(uint gasPrice) public {
         oraclize_setCustomGasPrice(gasPrice);
@@ -40,25 +42,32 @@ contract YouTubeEvidences is usingOraclize {
                 .addEvidence(evidences[evidenceId].evidencedId);
             evidences[evidenceId].isVerified = true;
             emit YouTubeEvidenceEvent(evidenceId, keccak256(evidences[evidenceId].evidencedId),
-                evidences[evidenceId].videoId);
+                evidences[evidenceId].videoId, evidences[evidenceId].evidencer);
         }
     }
 
-    /// @notice Check using an oracle if the YouTube `videoId` is linked to the manifestation `hash`.
+    /// @notice Check using an oracle if the YouTube `videoId` is linked to the manifestation with
+    /// identifier `evidencedId` in the registry with address `registry`, optimizing the oracle
+    /// call for gas limit `gasLimit`.
     /// @dev The oracle checks if the YouTube page for the video contains a link in its description
     /// pointing to the manifestation hash.
     /// @param registry The address of the contract holding the items evidenced
     /// @param evidencedId The identifier used by the registry contract for the item receiving evidence
     /// @param videoId The identifier of a YouTube video to be checked
-    function check(address registry, string evidencedId, string videoId, uint gaslimit) public payable {
-        require(address(this).balance >= oraclize_getPrice("URL", gaslimit), "Not enough funds to run Oraclize query");
+    /// @param gasLimit The gas limit required by the Oraclize callback __callback(...)
+    function check(address registry, string evidencedId, string videoId, uint gasLimit) public payable {
+        require(address(this).balance >= oraclize_getPrice("URL", gasLimit), "Not enough funds to run Oraclize query");
         string memory query = strConcat(HTML, videoId, XPATH, evidencedId, "')]))");
-        bytes32 evidenceId = oraclize_query("URL", query, gaslimit);
-        evidences[evidenceId] = YouTubeEvidence(registry, evidencedId, videoId, true, false);
+        bytes32 evidenceId = oraclize_query("URL", query, gasLimit);
+        evidences[evidenceId] = YouTubeEvidence(registry, msg.sender, evidencedId, videoId, true, false);
         emit OraclizeQuery(evidenceId);
     }
 
-    function getPrice(uint gaslimit) public constant returns (uint) {
-        return oraclize_getPrice("URL", gaslimit);
+    /// @notice Get the Oraclize call price for the input gas limit `gasLimit`.
+    /// @dev Used to show to the user the requested price for the Oraclize call.
+    /// @param registry Compute the call price based on the expected gas limit required by the
+    /// Oraclize callback, recommended 100M gas as per tests in test/youtubeevidences.test.js
+    function getPrice(uint gasLimit) public constant returns (uint) {
+        return oraclize_getPrice("URL", gasLimit);
     }
 }
