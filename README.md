@@ -458,7 +458,7 @@ https://docs.zeppelinos.org/docs/low_level_contract.html
 
 Upgradeability of the *Manifestations* contract is tested in [manifestations_upgradeability.test.js](test/manifestations_upgradeability.test.js)
 
-The file [5_upgrade_manifestations](migrations/5_upgrade_manifestations.js.example) provides an example of how
+The file [6_upgrade_manifestations](migrations/6_upgrade_manifestations.js.example) provides an example of how
 **Manifestations** can be upgraded adding a new migration step.
 
 NOTE: When testing locally, the second account (accounts[1] with ENS name "Bob.eth") is configured as the proxy administrator. For

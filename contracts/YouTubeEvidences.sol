@@ -51,7 +51,7 @@ contract YouTubeEvidences is usingOraclize {
     /// call for gas limit `gasLimit`.
     /// @dev The oracle checks if the YouTube page for the video contains a link in its description
     /// pointing to the manifestation hash.
-    /// @param registry The address of the contract holding the items evidenced
+    /// @param registry The address of the contract holding the items receiving evidence
     /// @param evidencedId The identifier used by the registry contract for the item receiving evidence
     /// @param videoId The identifier of a YouTube video to be checked
     /// @param gasLimit The gas limit required by the Oraclize callback __callback(...)
@@ -65,7 +65,7 @@ contract YouTubeEvidences is usingOraclize {
 
     /// @notice Get the Oraclize call price for the input gas limit `gasLimit`.
     /// @dev Used to show to the user the requested price for the Oraclize call.
-    /// @param registry Compute the call price based on the expected gas limit required by the
+    /// @param gasLimit Compute the call price based on the expected gas limit required by the
     /// Oraclize callback, recommended 100M gas as per tests in test/youtubeevidences.test.js
     function getPrice(uint gasLimit) public constant returns (uint) {
         return oraclize_getPrice("URL", gasLimit);

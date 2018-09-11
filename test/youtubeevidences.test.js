@@ -16,6 +16,7 @@ contract('YouTubeEvidences - Check YouTube video ownership', function (accounts)
   const VIDEO_ID2 = "3ANLBcUwizg";
   const ORACLIZE_GASLIMIT = 100000;
   const ORACLIZE_GASPRICE = 10000000000; // 10 GWei
+  const ORACLIZE_DELAY = 20*1000; // 20 seconds
 
 
   let evidences, proxy, manifestations, evidenceId, evidencedIdHash, evidenceVideoId, exception, price;
@@ -47,7 +48,7 @@ contract('YouTubeEvidences - Check YouTube video ownership', function (accounts)
 
     await evidences.check(manifestations.address, HASH1, VIDEO_ID1, ORACLIZE_GASLIMIT, {value: price});
 
-    await sleep(15*1000); // Wait for Oraclize callback
+    await sleep(ORACLIZE_DELAY); // Wait for Oraclize callback
 
     assert.equal(eventEmitted, true,
         'YouTube video linked to its manifestation should emit a YouTubeEvidenceEvent');
@@ -70,7 +71,7 @@ contract('YouTubeEvidences - Check YouTube video ownership', function (accounts)
 
     await evidences.check(manifestations.address, HASH1, VIDEO_ID2, ORACLIZE_GASLIMIT, {value: price});
 
-    await sleep(15*1000); // Wait for Oraclize callback
+    await sleep(ORACLIZE_DELAY); // Wait for Oraclize callback
 
     assert.equal(eventEmitted, false,
       'YouTube video not linked to its manifestation shouldn\'t emit a YouTubeEvidenceEvent');
@@ -89,7 +90,7 @@ contract('YouTubeEvidences - Check YouTube video ownership', function (accounts)
 
     await evidences.check(manifestations.address, HASH2, VIDEO_ID1, ORACLIZE_GASLIMIT, {value: price});
 
-    await sleep(15*1000); // Wait for Oraclize callback
+    await sleep(ORACLIZE_DELAY); // Wait for Oraclize callback
 
     assert.equal(eventEmitted, false,
       'Evidence for non-existing manifestation shouldn\'t emit a YouTubeEvidenceEvent');
