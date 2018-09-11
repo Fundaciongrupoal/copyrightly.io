@@ -42,15 +42,31 @@
 
     <!-- Evidence price input -->
     <div class="form-group">
-      <label class="control-label" for="inputPrice">Evidence price (Ether)*</label>
+      <label class="control-label" for="inputPrice">Evidence validation cost (Ether)*</label>
       <input id="inputPrice" name="inputPrice" type="number" class="form-control"
              readonly required [(ngModel)]="price" #inputPrice="ngModel">
+    </div>
+
+    <!-- YouTube Link input -->
+    <div class="form-group">
+      <div class="form-check">
+        <input id="linkedFromYouTube" name="linkedFromYouTube" type="checkbox"
+               class="form-check-input" [(ngModel)]="linkedFromYouTube">
+        <label class="control-label" for="linkedFromYouTube">The <b>description of the YouTube video
+          includes a link to this manifestation</b>, as a way to proof that I'm its owner.<br>
+          <small>For instance, you can copy the following fragment and paste it as part of the video
+            description in YouTube. Please, do this prior to registering this evidence.
+            Otherwise, the evidence will not be valid and the validation cost lost.
+          </small>
+        </label>
+      </div>
+      <textarea id="inputYouTubeLink" class="form-control" rows="1">Registered in CopyrightLY: https://copyrightly.io/manifestations/{{youtubeEvidence.evidencedId}}</textarea>
     </div>
 
     <!-- Button -->
     <div class="form-group">
       <button id="register" type="submit" class="btn btn-success pull-right"
-              [disabled]="!evidenceForm.form.valid || !inputVideoId.value">Register</button>
+              [disabled]="!evidenceForm.form.valid || !inputVideoId.value || !linkedFromYouTube">Register</button>
       <button id="cancel" type="button" class="btn btn-danger pull-right ml-2"
               (click)="cancelEvidence()">Cancel</button>
     </div>

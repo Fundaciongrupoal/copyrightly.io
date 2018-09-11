@@ -5,7 +5,6 @@ import { Web3Service } from '../../util/web3.service';
 import { IpfsService } from '../../util/ipfs.service';
 import { YouTubeEvidencesContractService } from '../youtube-evidences-contract.service';
 import { NgForm } from '@angular/forms';
-import { YouTubeEvidenceEventComponent } from '../youtube-evidence-event.component';
 import { YouTubeEvidence } from '../youtubeEvidence';
 import { Manifestation } from '../../manifestations/manifestation';
 
@@ -23,6 +22,7 @@ export class YouTubeEvidenceComponent implements OnInit {
   youtubeEvidence = new YouTubeEvidence();
   price = 0;
   stake = 2.5;
+  linkedFromYouTube = false;
 
   constructor(private web3Service: Web3Service,
               private ipfsService: IpfsService,
