@@ -34,9 +34,9 @@ before_script:
 script:
   - npm run lint
   - npm run network > /dev/null &
-  - while ! nc -z localhost 8545; do sleep 10; done
+  - while ! nc -z localhost 8545; do sleep 5; done
   - npm run ethereum-bridge > /dev/null &
-  - sleep 15
+  - sleep 25
   - npm run migrate
   - npm run soltest
   - npm run e2e

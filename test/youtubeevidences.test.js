@@ -16,7 +16,7 @@ contract('YouTubeEvidences - Check YouTube video ownership', function (accounts)
   const VIDEO_ID2 = "3ANLBcUwizg";
   const ORACLIZE_GASLIMIT = 100000;
   const ORACLIZE_GASPRICE = 10000000000; // 10 GWei
-  const ORACLIZE_DELAY = 20*1000; // 20 seconds
+  const ORACLIZE_DELAY = 30*1000; // 30 seconds
 
 
   let evidences, proxy, manifestations, evidenceId, evidencedIdHash, evidenceVideoId, exception, price;
