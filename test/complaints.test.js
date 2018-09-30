@@ -63,7 +63,7 @@ contract('Complaints - Register complaints', function (accounts) {
     }
 
     assert.equal(eventEmitted, false,
-      'a repited complaint should not emit a ComplaintEvent');
+      'a repeated complaint should not emit a ComplaintEvent');
   });
 
   it("shouldn't allow to revoke complaint if not contract owner", async () => {
