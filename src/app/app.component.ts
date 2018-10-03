@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.watchManifestEvents(); TODO: Disabled because not working with current MetaMask and Web3 1.0, using events in tx receipt instead
-    this.watchYouTubeEvidenceEvents();
+    // this.watchYouTubeEvidenceEvents();
   }
 
   watchManifestEvents() {
