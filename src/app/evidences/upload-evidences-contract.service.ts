@@ -21,8 +21,8 @@ export class UploadEvidencesContractService {
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.web3.eth.net.getId()
-    .then(network_id => {
+    this.web3Service.getNetworkId()
+    .subscribe(network_id => {
       if (evidences.networks[network_id]) {
         const deployedAddress = evidences.networks[network_id].address;
         this.manifestationsAddress = proxy.networks[network_id].address;

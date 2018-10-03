@@ -16,8 +16,8 @@ export class EnsService {
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.web3.eth.net.getId()
-    .then(network_id => {
+    this.web3Service.getNetworkId()
+    .subscribe(network_id => {
       if (network_id > 4) {
         if (localENS.networks[network_id]) {
           const deployedAddress = localENS.networks[network_id].address;
