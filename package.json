@@ -46,6 +46,7 @@
     "ethereum-ens": "^0.7.4",
     "ipfs-api": "^24.0.2",
     "rxjs": "^6.0.0",
+    "uport-connect": "^0.7.8",
     "web3": "^1.0.0-beta.36",
     "zone.js": "^0.8.26"
   },
