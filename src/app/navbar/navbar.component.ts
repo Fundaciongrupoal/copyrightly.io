@@ -5,10 +5,6 @@ import { Web3Service } from '../util/web3.service';
 import { AuthenticationService } from './authentication.service';
 import { EnsService } from '../util/ens.service';
 
-import { Connect } from 'uport-connect';
-declare let require: any;
-const Web3 = require('web3');
-
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -21,7 +17,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public account: string;
   public accountsNames: string[];
   public accounts: string[];
-  private connect: Connect;
 
   constructor(private web3Service: Web3Service,
               private authenticationService: AuthenticationService,
@@ -56,18 +51,5 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
-  }
-
-  loginUPort() {
-    const appName = 'copyrightly.io';
-
-    this.connect = new Connect(appName, {network: 'rinkeby'});
-    const provider = this.connect.getProvider();
-    const web3 = new Web3(provider);
-
-    web3.eth.getCoinbase((err, address) => {
-      if (err) { console.log(err); }
-      alert('Logged In \n' + 'EthAddress: ' + address);
-    });
   }
 }
