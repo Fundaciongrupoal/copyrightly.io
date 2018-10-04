@@ -1,5 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
+import { Connect } from 'uport-connect';
 
 declare let require: any;
 declare let window: any;
@@ -13,6 +14,11 @@ export class Web3Service {
   public useWebSockets = false; // Disabled for improved interoperability with current tools
   public web3: any;
   private networkId: number;
+  private connect: Connect;
+
+  private uPortNetwork = 'ropsten';
+  private uPortNetworkId = 3;
+  private uPortAppName = 'copyrightly.io';
 
   constructor(private ngZone: NgZone) {
     if (typeof window.web3 === 'undefined') {
@@ -44,7 +50,26 @@ export class Web3Service {
       console.log('Using Web3 provided by the browser');
       this.web3 = new Web3(window.web3.currentProvider);
     }
-    this.web3.eth.net.getId().then(networkId => this.networkId = networkId);
+  }
+
+  public getNetworkId(): Observable<number> {
+    return new Observable((observer) => {
+      this.web3.eth.net.getId()
+      .then(networkId => {
+        this.networkId = networkId;
+        observer.next(this.networkId);
+        observer.complete();
+      })
+      .catch(error => { // No Web3 available, try uPort
+        this.connect = new Connect(this.uPortAppName, {network: this.uPortNetwork});
+        const provider = this.connect.getProvider();
+        this.web3 = new Web3(provider);
+        this.networkId = this.uPortNetworkId;
+        observer.next(this.networkId);
+        observer.complete();
+      });
+      return { unsubscribe() {} };
+    });
   }
 
   public getNetworkName() {
@@ -87,7 +112,8 @@ export class Web3Service {
       this.web3.eth.getBlock(blockNumber)
       .then(block => {
         this.ngZone.run(() => {
-          observer.next(new Date(block.timestamp * 1000));
+          const date = block !== null ? new Date(block.timestamp * 1000) : new Date();
+          observer.next(date);
           observer.complete();
         });
       })

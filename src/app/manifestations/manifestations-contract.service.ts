@@ -19,17 +19,17 @@ export class ManifestationsContractService {
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.web3.eth.net.getId()
-    .then(network_id => {
-      if (proxy.networks[network_id]) {
-        const deployedAddress = proxy.networks[network_id].address;
-        this.deployedContract.next(
-          new this.web3Service.web3.eth.Contract(artifacts.abi, deployedAddress));
-      } else {
-        this.deployedContract.error(new Error('Manifestations contract ' +
-          'not found in current network with id ' + network_id));
-      }
-    });
+    this.web3Service.getNetworkId()
+      .subscribe(network_id => {
+        if (proxy.networks[network_id]) {
+          const deployedAddress = proxy.networks[network_id].address;
+          this.deployedContract.next(
+            new this.web3Service.web3.eth.Contract(artifacts.abi, deployedAddress));
+        } else {
+          this.deployedContract.error(new Error('Manifestations contract ' +
+            'not found in current network with id ' + network_id));
+        }
+      });
   }
 
   public getManifestation(hash: string): Observable<Manifestation> {

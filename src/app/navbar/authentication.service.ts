@@ -8,7 +8,6 @@ import { EnsService } from '../util/ens.service';
   providedIn: 'root'
 })
 export class AuthenticationService {
-
   private accounts = new BehaviorSubject<string[]>([]);
   private accountsNames = new BehaviorSubject<string[]>([]);
   private selectedAccount = new BehaviorSubject<string>('');
@@ -16,7 +15,11 @@ export class AuthenticationService {
   constructor(private web3Service: Web3Service,
               private alertsService: AlertsService,
               private ensService: EnsService) {
-    this.refreshAccounts();
+    this.web3Service.getNetworkId()
+      .subscribe(() => {
+        this.refreshAccounts();
+      },
+      error => this.alertsService.error(error));
   }
 
   public refreshAccounts() {
