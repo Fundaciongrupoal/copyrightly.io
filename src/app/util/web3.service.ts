@@ -16,8 +16,9 @@ export class Web3Service {
   private networkId: number;
   private connect: Connect;
 
-  private defaultNetwork = 'rinkeby';
-  private appName = 'copyrightly.io';
+  private uPortNetwork = 'ropsten';
+  private uPortNetworkId = 3;
+  private uPortAppName = 'copyrightly.io';
 
   constructor(private ngZone: NgZone) {
     if (typeof window.web3 === 'undefined') {
@@ -60,10 +61,10 @@ export class Web3Service {
         observer.complete();
       })
       .catch(error => { // No Web3 available, try uPort
-        this.connect = new Connect(this.appName, {network: this.defaultNetwork});
+        this.connect = new Connect(this.uPortAppName, {network: this.uPortNetwork});
         const provider = this.connect.getProvider();
         this.web3 = new Web3(provider);
-        this.networkId = 4;
+        this.networkId = this.uPortNetworkId;
         observer.next(this.networkId);
         observer.complete();
       });
