@@ -16,8 +16,8 @@ export class Web3Service {
   private networkId: number;
   private connect: Connect;
 
-  private uPortNetwork = 'ropsten';
-  private uPortNetworkId = 3;
+  private uPortNetwork = 'rinkeby';
+  private uPortNetworkId = 4;
   private uPortAppName = 'copyrightly.io';
 
   constructor(private ngZone: NgZone) {
