@@ -31,7 +31,7 @@ module.exports = {
     ropsten: {
       provider: function() {
         return new HDWalletProvider(process.env.MNEMONIC,
-          "https://ropsten.infura.io/" + process.env.INFURA_TOKEN, 0, 2)
+          "https://ropsten.infura.io/v3/" + process.env.INFURA_TOKEN, 0, 2)
       },
       network_id: 3,
       gas: 3000000,
@@ -40,7 +40,7 @@ module.exports = {
     rinkeby: {
       provider: function() {
         return new HDWalletProvider("candy maple cake sugar pudding cream honey rich smooth crumble sweet treat",
-          "https://rinkeby.infura.io/" + process.env.INFURA_TOKEN, 0, 2)
+          "https://rinkeby.infura.io/v3/" + process.env.INFURA_TOKEN, 0, 2)
       },
       network_id: 4,
       gas: 3000000,
