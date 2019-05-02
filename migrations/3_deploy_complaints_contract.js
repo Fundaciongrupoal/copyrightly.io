@@ -8,7 +8,7 @@ module.exports = async function (deployer, network, accounts) {
     const proxy = await Proxy.deployed();
 
     return Promise.all([
-      deployer.deploy(Complaints, proxy.address, {from: owner})
+      await deployer.deploy(Complaints, proxy.address, {from: owner})
     ]);
   });
 };

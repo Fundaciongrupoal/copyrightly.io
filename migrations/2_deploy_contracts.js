@@ -15,7 +15,7 @@ module.exports = async function(deployer, network, accounts) {
     await deployer.deploy(ExpirableLib);
     await deployer.link(ExpirableLib, [Manifestations]);
     await deployer.deploy(Manifestations, timeToExpiry);
-    await deployer.deploy(Proxy, Manifestations.address, {from: proxyAdmin});
+    await deployer.deploy(Proxy, Manifestations.address, proxyAdmin, []);
     await deployer.deploy(UploadEvidences);
 
     const manifestations = await Manifestations.deployed();
@@ -24,7 +24,7 @@ module.exports = async function(deployer, network, accounts) {
     const proxied = await Manifestations.at(proxy.address);
 
     return Promise.all([
-      await proxied.initialize(owner, timeToExpiry),
+      await proxied.initialize(timeToExpiry),
       await proxied.addEvidenceProvider(uploadEvidences.address),
     ]);
   });

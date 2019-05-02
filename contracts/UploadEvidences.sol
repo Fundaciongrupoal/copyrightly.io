@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.21 <0.6.0;
 
 import "./Evidencable.sol";
 
@@ -9,12 +9,12 @@ contract UploadEvidences {
     /// @notice Allows checking if some content has already been used as evidence.
     mapping(string => bool) private existingEvidence;
 
-    event UploadEvidenceEvent(address indexed registry, bytes32 indexed evidencedIdHash,
+    event UploadEvidenceEvent(address indexed registry, string indexed evidencedIdHash,
         string evidenceHash, address indexed evidencer);
 
     /// @notice Get if the evidence with content hash `evidenceHash` is already registered.
     /// @param evidenceHash Hash of the evidence content, for instance IPFS Base58 Hash
-    function getEvidenceExistence(string evidenceHash) public constant returns (bool) {
+    function getEvidenceExistence(string memory evidenceHash) public view returns (bool) {
         return existingEvidence[evidenceHash];
     }
 
@@ -26,10 +26,10 @@ contract UploadEvidences {
     /// @param registry The address of the contract holding the items evidenced
     /// @param evidencedId The identifier used by the registry contract for the item receiving evidence
     /// @param evidenceHash Hash of the uploaded content to be used as evidence, for instance IPFS Base58 Hash
-    function addEvidence(address registry, string evidencedId, string evidenceHash) public {
+    function addEvidence(address registry, string memory evidencedId, string memory evidenceHash) public {
         require(!existingEvidence[evidenceHash], "The evidence has been already registered");
         Evidencable(registry).addEvidence(evidencedId);
         existingEvidence[evidenceHash] = true;
-        emit UploadEvidenceEvent(registry, keccak256(evidencedId), evidenceHash, msg.sender);
+        emit UploadEvidenceEvent(registry, evidencedId, evidenceHash, msg.sender);
     }
 }

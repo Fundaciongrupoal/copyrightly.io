@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.21 <0.6.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -16,7 +16,7 @@ library ExpirableLib {
     /// @notice Check if `self` TimeAndExpiry struct expiry time has arrived.
     /// @dev This method checks if there is a expiry time and if it is expired.
     /// @param self TimeAndExpiry struct
-    function isExpired(TimeAndExpiry storage self) internal constant returns(bool) {
+    function isExpired(TimeAndExpiry storage self) internal view returns(bool) {
         return (self.expiryTime > 0 && self.expiryTime < now);
     }
 

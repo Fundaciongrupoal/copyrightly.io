@@ -38,33 +38,39 @@ contract('Manifestations - Upgradeability', function (accounts) {
         'unexpected first author in manifestation authors');
   });
 
-  it("shouldn't work when called by admin through proxy for security", async () => {
-    let eventEmitted = false;
-    const event = manifestations.ManifestEvent();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
+  it("shouldn't allow upgrade if called by non-admin", async () => {
+    let failed = false;
+    const newManifestations = await Manifestations.new(timeToExpiry, {from: OWNER});
+    try {
+      await proxy.upgradeTo(newManifestations.address, {from: OWNER});
+    } catch(e) {
+      failed = true;
+      assert(e.message, "Error: VM Exception while processing transaction: revert");
+    }
+    assert.equal(failed, true,
+      'should have failed because non-admins cannot upgrade the contract');
+  });
 
+  it("shouldn't work when called by admin through proxy for security", async () => {
+    let failed = false;
     try {
       await manifestations.manifestAuthorship(HASH2, TITLE, {from: PROXYADMIN});
     } catch(e) {
+      failed = true;
       assert(e.message, "Error: VM Exception while processing transaction: revert");
     }
-
-    assert.equal(eventEmitted, false,
-        'should have reverted and emit no ManifestEvent');
+    assert.equal(failed, true,
+      'should have failed because admin cannot be used with proxied contract for security');
   });
 
   it("should fail when trying to re-initialize it", async () => {
     let failed = false;
-
     try {
       await manifestations.initialize(OWNER);
     } catch(e) {
       failed = true;
       assert(e.message, "Error: VM Exception while processing transaction: revert");
     }
-
     assert.equal(failed, true,
       'should have failed because already initialized during migrations');
   });

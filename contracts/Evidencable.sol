@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.21 <0.6.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -20,13 +20,13 @@ contract Evidencable is Ownable {
 
     /// @notice Get the evidence count for the manifestation with `hash`.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
-    function getEvidenceCount(string hash) public constant returns (uint8) {
+    function getEvidenceCount(string memory hash) public view returns (uint8) {
         return evidenceCounts[hash];
     }
 
     /// @notice Adds one to the evidence count for the manifestation with `hash`.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
-    function addEvidence(string hash) public onlyEvidenceProvider {
+    function addEvidence(string memory hash) public onlyEvidenceProvider {
         evidenceCounts[hash] = uint8(evidenceCounts[hash].add(1));
     }
 
@@ -40,7 +40,7 @@ contract Evidencable is Ownable {
     /// @notice Check if the evidencable `hash` has no evidence yet.
     /// @dev Used to check if the corresponding item evidence count is 0.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
-    function isUnevidenced(string hash) internal constant returns(bool) {
+    function isUnevidenced(string memory hash) internal view returns(bool) {
         return (evidenceCounts[hash] == 0);
     }
 }
