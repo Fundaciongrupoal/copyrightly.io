@@ -15,8 +15,8 @@ contract("UploadEvidences - Manifestations accumulate evidence", function (accou
   const EVIDENCE_HASH1 = "QmPP8X2rWc2uanbnKpxfzEAAuHPuThQRtxpoY8CYVJxDj8";
   const EVIDENCE_HASH2 = "QmPP8X2rWc2uanbnKpxfzEAAuHPuThQRtxpoY8CYVjXdJ8";
 
-  let evidences, proxy, manifestations, registry,
-    evidencedIdHash, evidenceHash, evidencer;
+  let evidences, proxy, manifestations, registry, evidencedIdHash, evidencedHash,
+    evidenceHash, evidencer;
 
   beforeEach("setup contracts for each test", async () => {
     proxy = await Proxy.deployed();
@@ -27,40 +27,68 @@ contract("UploadEvidences - Manifestations accumulate evidence", function (accou
 
   it("should add evidence if registered evidence provider", async () => {
     await manifestations.manifestAuthorship(HASH1, TITLE1, {from: MANIFESTER});
-    const receipt = await evidences.addEvidence(
+    let eventEmitted = false;
+    const indexedEvidenceHash = web3.utils.soliditySha3(HASH1);
+    await evidences.UploadEvidenceEvent({
+      filter: { evidencedIdHash: indexedEvidenceHash },
+      fromBlock: 0 }, (error, event) => {
+        registry = event.args.registry;
+        evidencedIdHash = event.args.evidencedIdHash;
+        evidencedHash = event.args.evidencedHash;
+        evidenceHash = event.args.evidenceHash;
+        evidencer = event.args.evidencer;
+        eventEmitted = true;
+    });
+
+    await evidences.addEvidence(
       manifestations.address, HASH1, EVIDENCE_HASH1, {from: MANIFESTER});
     const evidenceCount = await manifestations.getEvidenceCount(HASH1);
 
     assert.equal(evidenceCount, 1,
-        "The manifestation should accumulate 1 evidence");
-    assert.equal(receipt.logs[0].event, "UploadEvidenceEvent",
-      "adding an upload evidence should emit an UploadEvidenceEvent");
-    assert.equal(receipt.logs[0].args.registry, manifestations.address,
+        "the manifestation should accumulate 1 evidence");
+    assert.equal(eventEmitted, true,
+        "adding an upload evidence should emit an UploadEvidenceEvent");
+    assert.equal(registry, manifestations.address,
         "the contract receiving the evidence should be the manifestations");
-    assert.equal(receipt.logs[0].args.evidencedIdHash, web3.utils.sha3(HASH1),
+    assert.equal(evidencedIdHash, web3.utils.soliditySha3(HASH1),
         "the manifestation receiving the evidence should be the manifested one");
-    assert.equal(receipt.logs[0].args.evidenceHash, EVIDENCE_HASH1,
+    assert.equal(evidencedHash, HASH1,
+      "the manifestation receiving the evidence should be the manifested one");
+    assert.equal(evidenceHash, EVIDENCE_HASH1,
         "the hash of the evidence should be the registered one");
-    assert.equal(receipt.logs[0].args.evidencer, MANIFESTER,
+    assert.equal(evidencer, MANIFESTER,
         "the account providing the evidence should be the same than the manifester");
   });
 
   it("should add multiple evidence for the same manifestation", async () => {
-    const receipt = await evidences.addEvidence(
+    let eventEmitted = false;
+    const indexedEvidenceHash = web3.utils.soliditySha3(HASH1);
+    await evidences.UploadEvidenceEvent({
+      filter: { evidencedIdHash: indexedEvidenceHash },
+      fromBlock: 0 }, (error, event) => {
+      registry = event.args.registry;
+      evidencedIdHash = event.args.evidencedIdHash;
+      evidencedHash = event.args.evidencedHash;
+      evidenceHash = event.args.evidenceHash;
+      evidencer = event.args.evidencer;
+      eventEmitted = true;
+    });
+
+    await evidences.addEvidence(
       manifestations.address, HASH1, EVIDENCE_HASH2, {from: MANIFESTER});
     const evidenceCount = await manifestations.getEvidenceCount(HASH1);
 
     assert.equal(evidenceCount, 2,
       "The manifestation should accumulate 2 evidence");
-    assert.equal(receipt.logs[0].event, "UploadEvidenceEvent",
+    assert.equal(eventEmitted, true,
       "adding an upload evidence should emit an UploadEvidenceEvent");
-    assert.equal(receipt.logs[0].args.registry, manifestations.address,
+    assert.equal(registry, manifestations.address,
       "the contract receiving the evidence should be the manifestations");
-    assert.equal(receipt.logs[0].args.evidencedIdHash, web3.utils.sha3(HASH1),
+    assert.equal(evidencedIdHash, web3.utils.sha3(HASH1),
       "the manifestation receiving the evidence should be the manifested one");
-    assert.equal(receipt.logs[0].args.evidenceHash, EVIDENCE_HASH2,
+    assert.equal(evidenceHash, EVIDENCE_HASH2,
       "the hash of the evidence should be the registered one");
-    assert.equal(receipt.logs[0].args.evidencer, MANIFESTER,
+    assert.equal(evidencer, MANIFESTER,
       "the account providing the evidence should be the same than the manifester");
   });
 
