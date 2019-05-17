@@ -20,11 +20,8 @@ contract YouTubeEvidences is usingOraclize {
 
     event OraclizeQuery(bytes32 evidenceId);
 
-    event YouTubeEvidenceEvent(bytes32 evidenceId, string indexed evidencedIdHash,
-        string videoId, address indexed evidencer);
-
-    event FailedYouTubeEvidenceEvent(bytes32 evidenceId, string indexed evidencedIdHash,
-        string videoId, address indexed evidencer);
+    event YouTubeEvidenceEvent(bytes32 evidenceId, bytes32 indexed evidencedIdHash,
+        string evidencedHash, string videoId, address indexed evidencer, bool isVerified);
 
     constructor(uint gasPrice) public {
         oraclize_setCustomGasPrice(gasPrice);
@@ -50,15 +47,13 @@ contract YouTubeEvidences is usingOraclize {
 
       evidences[evidenceId].isPending = false;
       if (parseInt(properLinksCount) > 0) {
-        Evidencable(evidences[evidenceId].registry)
-        .addEvidence(evidences[evidenceId].evidencedId);
+        Evidencable(evidences[evidenceId].registry).addEvidence(evidences[evidenceId].evidencedId);
         evidences[evidenceId].isVerified = true;
-        emit YouTubeEvidenceEvent(evidenceId, evidences[evidenceId].evidencedId,
-          evidences[evidenceId].videoId, evidences[evidenceId].evidencer);
-      } else {
-        emit FailedYouTubeEvidenceEvent(evidenceId, evidences[evidenceId].evidencedId,
-          evidences[evidenceId].videoId, evidences[evidenceId].evidencer);
       }
+      emit YouTubeEvidenceEvent(evidenceId,
+          keccak256(abi.encodePacked(evidences[evidenceId].evidencedId)),
+          evidences[evidenceId].evidencedId, evidences[evidenceId].videoId,
+          evidences[evidenceId].evidencer, evidences[evidenceId].isVerified);
     }
 
     /// @notice Check using an oracle if the YouTube `videoId` is linked to the manifestation with
@@ -72,6 +67,7 @@ contract YouTubeEvidences is usingOraclize {
     /// @param gasLimit The gas limit required by the Oraclize callback __callback(...)
     function check(address registry, string memory evidencedId, string memory videoId, uint gasLimit) public payable {
         require(address(this).balance >= oraclize_getPrice("URL", gasLimit), "Not enough funds to run Oraclize query");
+
         string memory query = strConcat(HTML, videoId, XPATH, evidencedId, "')]))");
         bytes32 evidenceId = oraclize_query("URL", query, gasLimit);
         evidences[evidenceId] = YouTubeEvidence(registry, msg.sender, evidencedId, videoId, true, false);
