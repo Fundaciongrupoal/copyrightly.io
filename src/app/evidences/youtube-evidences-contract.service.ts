@@ -5,26 +5,24 @@ import { ReplaySubject } from 'rxjs';
 import { YouTubeEvidence } from './youtubeEvidence';
 import { YouTubeEvidenceEvent } from './youtube-evidence-event';
 import { Event } from '../util/event';
+import { ManifestEvent } from '../manifestations/manifest-event';
 
 declare const require: any;
 const evidences = require('../../assets/contracts/YouTubeEvidences.json');
 const proxy = require('../../assets/contracts/AdminUpgradeabilityProxy.json');
 
-const web3 = require('web3');
-
 @Injectable({
   providedIn: 'root'
 })
 export class YouTubeEvidencesContractService {
-  private ORACLIZE_GASLIMIT = 100000;
+  private ORACLIZE_GASLIMIT = 120000;
 
   private deployedContract = new ReplaySubject<any>(1);
   private manifestationsAddress: string;
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.getNetworkId()
-    .subscribe(network_id => {
+    this.web3Service.networkId.subscribe(network_id => {
       if (evidences.networks[network_id]) {
         const deployedAddress = evidences.networks[network_id].address;
         this.manifestationsAddress = proxy.networks[network_id].address;
@@ -41,7 +39,7 @@ export class YouTubeEvidencesContractService {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
         contract.methods.check(this.manifestationsAddress, evidence.evidencedId, evidence.videoId, this.ORACLIZE_GASLIMIT)
-        .send({from: account, gas: 300000, value: web3.utils.toWei(price)})
+        .send({from: account, gas: 320000, value: this.web3Service.web3.utils.toWei(price)})
         .on('transactionHash', hash =>
           this.ngZone.run(() => {
             observer.next(hash);
@@ -63,25 +61,27 @@ export class YouTubeEvidencesContractService {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
         contract.getPastEvents('YouTubeEvidenceEvent',
-          {filter: {evidencedIdHash: web3.utils.soliditySha3(manifestationHash)}, fromBlock: 0})
-        .then(events => {
-          observer.next(events.map(event => {
-            event.returnValues.evidencedId = manifestationHash;
-            const evidenceEvent = new YouTubeEvidenceEvent(event);
-            this.web3Service.getBlockDate(event.blockNumber)
-            .subscribe(date =>
-              this.ngZone.run(() => evidenceEvent.when = date)
-            );
-            return evidenceEvent;
-          }));
-          observer.complete();
-        })
-        .catch(error => {
-          console.log(error);
-          this.ngZone.run(() => {
-            observer.error(new Error('Error listing manifestation\'s evidence, see log for details'));
-            observer.complete();
-          });
+          {filter: {evidencedIdHash: this.web3Service.web3.utils.soliditySha3(manifestationHash)}, fromBlock: 0},
+          (error, events) => {
+            if (error) {
+              console.log(error);
+              this.ngZone.run(() => {
+                observer.error(new Error('Error listing manifestation\'s evidence, see log for details'));
+                observer.complete();
+              });
+            } else {
+              observer.next(events
+              .filter(event => event.returnValues.isVerified)
+              .map(event => {
+                const evidenceEvent = new YouTubeEvidenceEvent(event);
+                this.web3Service.getBlockDate(event.blockNumber)
+                .subscribe(date =>
+                  this.ngZone.run(() => evidenceEvent.when = date)
+                );
+                return evidenceEvent;
+              }));
+              observer.complete();
+            }
         });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
@@ -91,29 +91,24 @@ export class YouTubeEvidencesContractService {
   public watchEvidenceEvents(account: string): Observable<Event> {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
-        contract.events.YouTubeEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' })
-        .on('data', event => {
-          const evidenceEvent = new YouTubeEvidenceEvent(event);
-          this.getEvidence(event.returnValues.evidenceId)
-          .subscribe(evidence => {
-            evidenceEvent.what.evidencedId = evidence.evidencedId;
-            this.web3Service.getBlockDate(event.blockNumber)
-            .subscribe(date => {
+        contract.events.YouTubeEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' },
+          (error, event) => {
+            if (error) {
+              console.log(error);
               this.ngZone.run(() => {
-                evidenceEvent.when = date;
-                observer.next(evidenceEvent);
-                observer.complete();
+                observer.error(new Error('Error listening to YouTube evidence events, see log for details'));
               });
-            });
+            } else {
+              const evidenceEvent = new YouTubeEvidenceEvent(event);
+              this.web3Service.getBlockDate(event.blockNumber)
+              .subscribe(date => {
+                this.ngZone.run(() => {
+                  evidenceEvent.when = date;
+                  observer.next(evidenceEvent);
+                });
+              });
+            }
           });
-        })
-        .on('error', error => {
-          console.log(error);
-          this.ngZone.run(() => {
-            observer.error(new Error('Error listening to YouTube evidence events, see log for details'));
-            observer.complete();
-          });
-        });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });
@@ -149,7 +144,8 @@ export class YouTubeEvidencesContractService {
         contract.methods.getPrice(this.ORACLIZE_GASLIMIT).call()
         .then(result => {
           this.ngZone.run(() => {
-            observer.next(web3.utils.fromWei(result));
+            const price = this.web3Service.web3.utils.fromWei(result.toString());
+            observer.next(price);
             observer.complete();
           });
         })

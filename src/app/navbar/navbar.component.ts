@@ -3,7 +3,7 @@ import { Subject } from 'rxjs/internal/Subject';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Web3Service } from '../util/web3.service';
 import { AuthenticationService } from './authentication.service';
-import { EnsService } from '../util/ens.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -19,8 +19,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public accounts: string[];
 
   constructor(private web3Service: Web3Service,
-              private authenticationService: AuthenticationService,
-              private ensService: EnsService) {}
+              private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.isCollapsed = true;
@@ -44,7 +43,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authenticationService.setSelectedAccount(selectedAccount);
   }
 
-  getCurrentNetwork(): string {
+  getCurrentNetwork(): Observable<string> {
     return this.web3Service.getNetworkName();
   }
 

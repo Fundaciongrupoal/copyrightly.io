@@ -19,17 +19,16 @@ export class ManifestationsContractService {
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.getNetworkId()
-      .subscribe(network_id => {
-        if (proxy.networks[network_id]) {
-          const deployedAddress = proxy.networks[network_id].address;
-          this.deployedContract.next(
-            new this.web3Service.web3.eth.Contract(artifacts.abi, deployedAddress));
-        } else {
-          this.deployedContract.error(new Error('Manifestations contract ' +
-            'not found in current network with id ' + network_id));
-        }
-      });
+    this.web3Service.networkId.subscribe(network_id => {
+      if (proxy.networks[network_id]) {
+        const deployedAddress = proxy.networks[network_id].address;
+        this.deployedContract.next(
+          new this.web3Service.web3.eth.Contract(artifacts.abi, deployedAddress));
+      } else {
+        this.deployedContract.error(new Error('Manifestations contract ' +
+          'not found in current network with id ' + network_id));
+      }
+    });
   }
 
   public getManifestation(hash: string): Observable<Manifestation> {
@@ -38,9 +37,15 @@ export class ManifestationsContractService {
         contract.methods.getManifestation(hash).call()
         .then(result => {
           this.ngZone.run(() => {
-            observer.next(new Manifestation(
-              {hash: hash, title: result[0], authors: result[1],
-                      when: result[2], expiry: result[3]}));
+            if (result) {
+              observer.next(new Manifestation(
+                {
+                  hash: hash, title: result[0], authors: result[1],
+                  when: result[2], expiry: result[3]
+                }));
+            } else {
+              observer.next(new Manifestation());
+            }
             observer.complete();
           });
         })
@@ -63,17 +68,6 @@ export class ManifestationsContractService {
         .send({from: account, gas: 150000})
         .on('transactionHash', hash =>
           this.ngZone.run(() => observer.next(hash)))
-        .on('receipt', receipt => {
-          const manifestEvent = new ManifestEvent(receipt.events.ManifestEvent);
-          this.web3Service.getBlockDate(receipt.events.ManifestEvent.blockNumber)
-          .subscribe(date => {
-            this.ngZone.run(() => {
-              manifestEvent.when = date;
-              observer.next(manifestEvent);
-              observer.complete();
-            });
-          });
-        })
         .on('error', error => {
           console.error(error);
           this.ngZone.run(() => {
@@ -89,24 +83,23 @@ export class ManifestationsContractService {
   public watchManifestEvents(account: string): Observable<Event> {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
-        contract.events.ManifestEvent({ filter: { manifester: account }, fromBlock: 'latest' })
-          .on('data', event => {
-            const manifestEvent = new ManifestEvent(event);
-            this.web3Service.getBlockDate(event.blockNumber)
-            .subscribe(date => {
+        contract.events.ManifestEvent({ filter: { manifester: account }, fromBlock: 'latest' },
+          (error, event) => {
+            if (error) {
+              console.log(error);
               this.ngZone.run(() => {
-                manifestEvent.when = date;
-                observer.next(manifestEvent);
-                observer.complete();
+                observer.error(new Error('Error listening to contract events, see log for details'));
               });
-            });
-          })
-          .on('error', error => {
-            console.log(error);
-            this.ngZone.run(() => {
-              observer.error(new Error('Error listening to contract events, see log for details'));
-              observer.complete();
-            });
+            } else {
+              const manifestEvent = new ManifestEvent(event);
+              this.web3Service.getBlockDate(event.blockNumber)
+              .subscribe(date => {
+                this.ngZone.run(() => {
+                  manifestEvent.when = date;
+                  observer.next(manifestEvent);
+                });
+              });
+            }
           });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };

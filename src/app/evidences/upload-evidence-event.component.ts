@@ -6,8 +6,8 @@ import { UploadEvidenceEvent } from './upload-evidence-event';
 @Component({
   selector: 'app-uploadevidence-modal-content',
   template: `
-    <div class="modal-header">
-      <h4 class="modal-title">Registered new Uploadable Evidence</h4>
+    <div class="modal-header bg-success text-white">
+      <h4 class="modal-title">Success<br/><small>Registered new Uploadable Evidence</small></h4>
       <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -40,7 +40,7 @@ import { UploadEvidenceEvent } from './upload-evidence-event';
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-success" (click)="details()">Details</button>
+      <button type="button" class="btn btn-info" (click)="details()">Manifestation Details</button>
     </div>
   `,
   styles: ['.modal-body { font-size: smaller; }']

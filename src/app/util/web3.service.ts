@@ -1,37 +1,28 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Connect } from 'uport-connect';
+import { ReplaySubject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import Web3 from 'web3';
 
 declare let require: any;
 declare let window: any;
-const Web3 = require('web3');
 const TRUFFLE_CONFIG = require('../../../truffle');
 
 @Injectable({
   providedIn: 'root'
 })
 export class Web3Service {
-  public useWebSockets = false; // Disabled for improved interoperability with current tools
+  public useWebSockets = true; // TODO: Disable to improve interoperability with current tools
   public web3: any;
-  private networkId: number;
-  private connect: Connect;
+  public  networkId = new ReplaySubject<any>(1);
 
+  private connect: Connect;
   private uPortNetwork = 'rinkeby';
-  private uPortNetworkId = 4;
   private uPortAppName = 'copyrightly.io';
 
   constructor(private ngZone: NgZone) {
     if (typeof window.web3 === 'undefined') {
-      // Listen for provider injection
-      window.addEventListener('message', ({ data }) => {
-        if (data && data.type && data.type === 'ETHEREUM_PROVIDER_SUCCESS') {
-          console.log('Using Web3 provided by the browser as requested');
-          this.web3 = new Web3(window.ethereum);
-        }
-      });
-      // Request provider
-      window.postMessage({ type: 'ETHEREUM_PROVIDER_REQUEST' }, '*');
-
       // Default, use local network defined by Truffle config if none provided
       if (this.useWebSockets) {
         const localNode = 'ws://' + TRUFFLE_CONFIG.networks.development.host + ':' +
@@ -44,56 +35,56 @@ export class Web3Service {
         console.log('Using Web3 for local node: ' + localNode);
         this.web3 = new Web3(new Web3.providers.HttpProvider(localNode));
         // Hack to provide backwards compatibility for Truffle, which uses web3js 0.20.x
-        Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
+        // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
       }
     } else {
-      console.log('Using Web3 provided by the browser');
-      this.web3 = new Web3(window.web3.currentProvider);
+      if (window.ethereum) {
+        this.web3 = new Web3(window.ethereum);
+      } else if (window.web3) {
+        this.web3 = new Web3(window.web3.currentProvider);
+      } else {
+        this.connect = new Connect(this.uPortAppName,
+          { network: this.uPortNetwork, accountType: 'general' });
+        this.web3 = new Web3(this.connect.getProvider());
+      }
     }
-  }
-
-  public getNetworkId(): Observable<number> {
-    return new Observable((observer) => {
-      this.web3.eth.net.getId()
+    this.web3.eth.net.getId()
       .then(networkId => {
-        this.networkId = networkId;
-        observer.next(this.networkId);
-        observer.complete();
-      })
-      .catch(error => { // No Web3 available, try uPort
-        this.connect = new Connect(this.uPortAppName, {network: this.uPortNetwork});
-        const provider = this.connect.getProvider();
-        this.web3 = new Web3(provider);
-        this.networkId = this.uPortNetworkId;
-        observer.next(this.networkId);
-        observer.complete();
+        this.networkId.next(networkId);
       });
-      return { unsubscribe() {} };
-    });
   }
 
-  public getNetworkName() {
-    switch (this.networkId) {
-      case 1: return 'MainNet';
-      case 2: return 'Morden';
-      case 3: return 'Ropsten';
-      case 4: return 'Rinkeby';
-      default: return 'LocalNet';
-    }
+  public getNetworkName(): Observable<string> {
+    return this.networkId.pipe(map(network => {
+      switch (network) {
+        case 1: return 'MainNet';
+        case 2: return 'Morden';
+        case 3: return 'Ropsten';
+        case 4: return 'Rinkeby';
+        default: return 'LocalNet';
+      }
+    }));
   }
 
   public getAccounts(): Observable<string[]> {
     return new Observable((observer) => {
       this.web3.eth.getAccounts()
         .then(accounts => {
-          this.ngZone.run(() => {
-            if (accounts.length === 0) {
-              observer.error('Couldn\'t get any accounts. Make sure you are logged in MetaMask ' +
-                'or Web3-enabled browser');
-            }
-            observer.next(accounts);
-            observer.complete();
-          });
+          if (accounts.length === 0) {
+            // Request account access if needed
+            window.ethereum.enable().then(enabledAccounts =>
+              this.ngZone.run(() => {
+                if (!enabledAccounts) { enabledAccounts = []; }
+                observer.next(enabledAccounts);
+                observer.complete();
+              })
+            ).catch(error => console.log('Error: ' + error));
+          } else {
+            this.ngZone.run(() => {
+              observer.next(accounts);
+              observer.complete();
+            });
+          }
         })
         .catch(error => {
           console.error(error);

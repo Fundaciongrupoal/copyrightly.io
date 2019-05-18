@@ -62,9 +62,6 @@ export class UploadEvidenceComponent implements OnInit {
             'Receipt: <a target="_blank" href="https://ropsten.etherscan.io/tx/' + result + '">' + result + '</a>');
           form.reset();
           this.done.emit();
-        } else {
-          console.log(result);
-          this.alertsService.modal(UploadEvidenceEventComponent, result);
         }
       }, error => {
         this.alertsService.error(error);

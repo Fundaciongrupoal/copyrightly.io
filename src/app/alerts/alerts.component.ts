@@ -19,7 +19,7 @@ export class AlertsComponent implements OnInit {
     this.alertsService.alerts$.subscribe(
       alert => {
         this.ngZone.runOutsideAngular(() => {
-          alert.timerId = setTimeout(() => {
+          alert.timerId = window.setTimeout(() => {
             this.ngZone.run(() => {
               this.close(alert);
             });

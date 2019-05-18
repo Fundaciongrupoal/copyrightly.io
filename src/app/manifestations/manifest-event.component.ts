@@ -6,8 +6,8 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-manifestation-modal-content',
   template: `
-    <div class="modal-header">
-      <h4 class="modal-title">Manifestation Registered</h4>
+    <div class="modal-header bg-success text-white">
+      <h4 class="modal-title">Success<br/><small>Manifestation Registered</small></h4>
       <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -35,7 +35,7 @@ import { Router } from '@angular/router';
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-success" (click)="details()">Details</button>
+      <button type="button" class="btn btn-info" (click)="details()">Details</button>
     </div>
   `,
   styles: ['.modal-body { font-size: smaller; }']

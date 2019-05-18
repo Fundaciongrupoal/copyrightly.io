@@ -4,12 +4,11 @@ import { Observable } from 'rxjs/internal/Observable';
 import { ReplaySubject } from 'rxjs';
 import { UploadEvidence } from './uploadEvidence';
 import { UploadEvidenceEvent } from './upload-evidence-event';
+import { Event } from '../util/event';
 
 declare const require: any;
 const evidences = require('../../assets/contracts/UploadEvidences.json');
 const proxy = require('../../assets/contracts/AdminUpgradeabilityProxy.json');
-
-const web3 = require('web3');
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +20,7 @@ export class UploadEvidencesContractService {
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
-    this.web3Service.getNetworkId()
-    .subscribe(network_id => {
+    this.web3Service.networkId.subscribe(network_id => {
       if (evidences.networks[network_id]) {
         const deployedAddress = evidences.networks[network_id].address;
         this.manifestationsAddress = proxy.networks[network_id].address;
@@ -62,21 +60,12 @@ export class UploadEvidencesContractService {
       this.deployedContract.subscribe(contract => {
         contract.methods.addEvidence(this.manifestationsAddress, evidence.evidencedHash, evidence.evidenceHash)
         .send({from: account, gas: 150000})
-        .on('transactionHash', hash =>
-          this.ngZone.run(() => observer.next(hash)))
-        .on('receipt', receipt => {
-          receipt.events.UploadEvidenceEvent.returnValues.evidencedHash = evidence.evidencedHash;
-          const evidenceEvent = new UploadEvidenceEvent(receipt.events.UploadEvidenceEvent);
-          this.web3Service.getBlockDate(receipt.events.UploadEvidenceEvent.blockNumber)
-          .subscribe(date => {
-            this.ngZone.run(() => {
-              evidenceEvent.when = date;
-              observer.next(evidenceEvent);
-              observer.complete();
-            });
-          });
-        })
-        .on('error', error => {
+        .once('transactionHash', hash =>
+          this.ngZone.run(() => {
+            observer.next(hash);
+            observer.complete();
+          }))
+        .once('error', error => {
           console.error(error);
           this.ngZone.run(() => {
             observer.error(new Error('Error registering evidence, see log for details'));
@@ -92,26 +81,52 @@ export class UploadEvidencesContractService {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
         contract.getPastEvents('UploadEvidenceEvent',
-          {filter: {evidencedIdHash: web3.utils.soliditySha3(manifestationHash)}, fromBlock: 0})
-        .then(events => {
-          observer.next(events.map(event => {
-            event.returnValues.evidencedHash = manifestationHash;
-            const evidenceEvent = new UploadEvidenceEvent(event);
-            this.web3Service.getBlockDate(event.blockNumber)
-            .subscribe(date =>
-              this.ngZone.run(() => evidenceEvent.when = date)
-            );
-            return evidenceEvent;
-          }));
-          observer.complete();
-        })
-        .catch(error => {
-          console.log(error);
-          this.ngZone.run(() => {
-            observer.error(new Error('Error listing manifestation\'s evidence, see log for details'));
-            observer.complete();
-          });
+          {filter: {evidencedIdHash: this.web3Service.web3.utils.soliditySha3(manifestationHash)}, fromBlock: 0},
+          (error, events) => {
+            if (error) {
+              console.log(error);
+              this.ngZone.run(() => {
+                observer.error(new Error('Error listing manifestation\'s evidence, see log for details'));
+                observer.complete();
+              });
+            } else {
+              observer.next(events.map(event => {
+                const evidenceEvent = new UploadEvidenceEvent(event);
+                this.web3Service.getBlockDate(event.blockNumber)
+                .subscribe(date =>
+                  this.ngZone.run(() => evidenceEvent.when = date)
+                );
+                return evidenceEvent;
+              }));
+              observer.complete();
+            }
         });
+      }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
+      return { unsubscribe() {} };
+    });
+  }
+
+  public watchEvidenceEvents(account: string): Observable<Event> {
+    return new Observable((observer) => {
+      this.deployedContract.subscribe(contract => {
+        contract.events.UploadEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' },
+          (error, event) => {
+            if (error) {
+              console.log(error);
+              this.ngZone.run(() => {
+                observer.error(new Error('Error listening to YouTube evidence events, see log for details'));
+              });
+            } else {
+              const evidenceEvent = new UploadEvidenceEvent(event);
+              this.web3Service.getBlockDate(event.blockNumber)
+              .subscribe(date => {
+                this.ngZone.run(() => {
+                  evidenceEvent.when = date;
+                  observer.next(evidenceEvent);
+                });
+              });
+            }
+          });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });

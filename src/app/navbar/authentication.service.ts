@@ -15,10 +15,8 @@ export class AuthenticationService {
   constructor(private web3Service: Web3Service,
               private alertsService: AlertsService,
               private ensService: EnsService) {
-    this.web3Service.getNetworkId()
-      .subscribe(() => {
-        this.refreshAccounts();
-      },
+    this.web3Service.networkId.subscribe(
+      () => this.refreshAccounts(),
       error => this.alertsService.error(error));
   }
 
