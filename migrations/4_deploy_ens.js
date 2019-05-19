@@ -1,12 +1,12 @@
-const ENSRegistry = artifacts.require("@ensdomains/ens/ENSRegistry.sol");
-const PublicResolver = artifacts.require("@ensdomains/ens/PublicResolver.sol");
-const ReverseRegistrar = artifacts.require("@ensdomains/ens/ReverseRegistrar.sol");
+const ENSRegistry = artifacts.require("\@ensdomains/ens/ENSRegistry.sol");
+const PublicResolver = artifacts.require("\@ensdomains/ens/PublicResolver.sol");
+const ReverseRegistrar = artifacts.require("\@ensdomains/ens/ReverseRegistrar.sol");
 
-const web3 = require("web3");
 const namehash = require("eth-ens-namehash");
 
 module.exports = async function (deployer, network, accounts) {
   const owner = accounts[0];
+  const rootNode = web3.utils.asciiToHex(0);
 
   deployer.then(async () => {
     if (network === "development") {
@@ -18,9 +18,9 @@ module.exports = async function (deployer, network, accounts) {
       const resolver = await PublicResolver.deployed();
       const reverseResolver = await ReverseRegistrar.deployed();
 
-      await ens.setSubnodeOwner(0, web3.utils.sha3('eth'), owner);
-      await ens.setSubnodeOwner(0, web3.utils.sha3('reverse'), owner);
-      await ens.setSubnodeOwner(namehash.hash('reverse'), web3.utils.sha3('addr'), reverseResolver.address);
+      await ens.setSubnodeOwner(rootNode, sha3('eth'), owner);
+      await ens.setSubnodeOwner(rootNode, sha3('reverse'), owner);
+      await ens.setSubnodeOwner(namehash.hash('reverse'), sha3('addr'), reverseResolver.address);
 
       return Promise.all([
         setENSName(ens, resolver, reverseResolver, accounts[0], 'Alice', owner),
@@ -31,7 +31,11 @@ module.exports = async function (deployer, network, accounts) {
   });
 };
 
+function sha3(string) {
+  return web3.utils.sha3(string);
+}
+
 async function setENSName(ens, resolver, reverseResolver, address, name, owner) {
-  await ens.setSubnodeOwner(namehash.hash('eth'), web3.utils.sha3(name), address, {from: owner});
+  await ens.setSubnodeOwner(namehash.hash('eth'), sha3(name), address, {from: owner});
   return reverseResolver.setName(`${name}.eth`, {from: address});
 }

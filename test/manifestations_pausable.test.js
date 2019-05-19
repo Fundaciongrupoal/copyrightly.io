@@ -4,6 +4,7 @@ const Proxy = artifacts.require("AdminUpgradeabilityProxy");
 contract('Manifestations - Pausable', function (accounts) {
 
   const OWNER = accounts[0];
+  const ADMIN = accounts[1];
   const MANIFESTER = accounts[2];
   const HASH1 = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const HASH2 = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnpBDg";
@@ -17,80 +18,44 @@ contract('Manifestations - Pausable', function (accounts) {
   });
 
   it("shouldn't work when paused by owner", async () => {
-    let eventEmitted = false;
-    let event = manifestations.Pause();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
+    const receipt = await manifestations.pause({from: OWNER});
 
-    await manifestations.pause({from: OWNER});
-
-    assert.equal(eventEmitted, true,
-      'should have emitted the Pause() event on pause');
-
-    eventEmitted = false;
-    event = manifestations.ManifestEvent();
-    await event.watch((error, result) => {
-      eventEmitted = true;
-    });
+    assert.equal(receipt.logs[0].event, 'Paused',
+      'should have emitted the Paused event on pause');
 
     try {
       await manifestations.manifestAuthorship(HASH1, TITLE, {from: MANIFESTER});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      assert(e.message, "Returned error: VM Exception while processing transaction: revert");
     }
 
-    assert.equal(eventEmitted, false,
-      'shouldn\'t have emitted a ManifestEvent');
+    const result = await manifestations.getManifestation(HASH1);
+
+    assert.equal(result[0], '', 'Title should be empty because no registrations while paused');
   });
 
   it("should work again when unpaused by owner", async () => {
-    let eventEmitted = false;
-    let event = manifestations.Unpause();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
+    const receipt = await manifestations.unpause({from: OWNER});
 
-    await manifestations.unpause({from: OWNER});
+    assert.equal(receipt.logs[0].event, 'Unpaused',
+      'should have emitted the Unpaused event on unpause');
 
-    assert.equal(eventEmitted, true,
-      'should have emitted the Unpause() event on pause');
+    await manifestations.manifestAuthorship(HASH1, TITLE, {from: MANIFESTER});
 
-    eventEmitted = false;
-    event = manifestations.ManifestEvent();
-    await event.watch((error, result) => {
-      manifestHash = result.args.hash;
-      manifestTitle = result.args.title;
-      manifestManifester = result.args.manifester;
-      eventEmitted = true;
-    });
+    const result = await manifestations.getManifestation(HASH1);
 
-    await manifestations.manifestAuthorship(HASH2, TITLE, {from: MANIFESTER});
-
-    assert.equal(eventEmitted, true,
-      'manifesting authorship should emit a ManifestEvent');
-    assert.equal(manifestHash, HASH2,
-      'unexpected manifest event hash');
-    assert.equal(manifestTitle, TITLE,
-      'unexpected manifest event title');
-    assert.equal(manifestManifester, MANIFESTER,
-      'unexpected manifest event manifester');
+    assert.equal(result[0], TITLE, 'Manifestation title should be registered when unpaused');
   });
 
   it("shouldn't be paused by a non-owner", async () => {
-    let eventEmitted = false;
-    const event = manifestations.Pause();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
-
+    let failed = false;
     try {
       await manifestations.pause({from: MANIFESTER});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      failed = true;
+      assert(e.message, "Returned error: VM Exception while processing transaction: revert");
     }
-
-    assert.equal(eventEmitted, false,
-      'shouldn\'t have emitted the Pause() event on pause');
+    assert.equal(failed, true,
+      'should have failed because non-owner cannot pause the contract');
   });
 });

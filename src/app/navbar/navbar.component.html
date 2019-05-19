@@ -44,7 +44,7 @@
           <div class="input-group input-group-sm">
             <div class="input-group-prepend">
               <span class="input-group-text" id="network-name">
-                <span class="fab fa-ethereum"></span>{{getCurrentNetwork()}}</span>
+                <span class="fab fa-ethereum"></span>{{getCurrentNetwork() | async}}</span>
             </div>
             <input *ngIf="accounts.length == 0"  id="no-account" name="no-account" type="text" readonly
                    class="form-control" value="Offline">

@@ -8,8 +8,9 @@ export class YouTubeEvidenceEvent extends Event {
     super({ type: event.event, who: event.returnValues.evidencer });
     this.what = new YouTubeEvidence({
       evidenceId: event.returnValues.evidenceId,
-      evidencedId: event.returnValues.evidencedId,
-      videoId: event.returnValues.videoId
+      evidencedId: event.returnValues.evidencedHash,
+      videoId: event.returnValues.videoId,
+      isVerified: event.returnValues.isVerified
     });
   }
 }

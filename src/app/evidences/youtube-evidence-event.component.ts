@@ -6,8 +6,14 @@ import { YouTubeEvidenceEvent } from './youtube-evidence-event';
 @Component({
   selector: 'app-youtubeevidence-modal-content',
   template: `
-    <div class="modal-header">
-      <h4 class="modal-title">Registered new YouTube Evidence</h4>
+    <div *ngIf="data.what.isVerified" class="modal-header bg-success text-white">
+      <h4 class="modal-title">Success<br/><small>Registered new YouTube Evidence</small></h4>
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div *ngIf="!data.what.isVerified" class="modal-header bg-danger text-white">
+      <h4 class="modal-title">Failed<br/><small>YouTube Evidence not Linked to Manifestation</small></h4>
       <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -40,7 +46,7 @@ import { YouTubeEvidenceEvent } from './youtube-evidence-event';
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-success" (click)="details()">Details</button>
+      <button type="button" class="btn btn-info" (click)="details()">Manifestation Details</button>
     </div>
   `,
   styles: ['.modal-body { font-size: smaller; }']

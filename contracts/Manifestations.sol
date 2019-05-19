@@ -1,7 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.21 <0.6.0;
 
-import "zos-lib/contracts/migrations/Initializable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zos-lib/contracts/upgradeability/AdminUpgradeabilityProxy.sol";
 import "./ExpirableLib.sol";
 import "./Evidencable.sol";
@@ -29,8 +29,9 @@ contract Manifestations is Pausable, Initializable, Evidencable {
     }
 
     /// @dev To be used when proxied (upgradeability) to initialize proxy storage
-    function initialize(address _owner, uint32 _timeToExpiry) public isInitializer {
-        owner = _owner;
+    function initialize(uint32 _timeToExpiry) public initializer {
+        _addPauser(msg.sender);
+        _transferOwnership(msg.sender);
         timeToExpiry = _timeToExpiry;
     }
 
@@ -39,7 +40,7 @@ contract Manifestations is Pausable, Initializable, Evidencable {
     /// Finally, emits ManifestEvent
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
     /// @param title The title of the manifestation
-    modifier registerIfAvailable(string hash, string title) {
+    modifier registerIfAvailable(string memory hash, string memory title) {
         require(bytes(title).length > 0, "A title is required");
         require(manifestations[hash].authors.length == 0 ||
                 (manifestations[hash].time.isExpired() && isUnevidenced(hash)),
@@ -55,7 +56,7 @@ contract Manifestations is Pausable, Initializable, Evidencable {
     /// @dev To be used when there is just one author, which is considered to be the message sender
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
     /// @param title The title of the manifestation
-    function manifestAuthorship(string hash, string title)
+    function manifestAuthorship(string memory hash, string memory title)
     public registerIfAvailable(hash, title) whenNotPaused() {
         address[] memory authors = new address[](1);
         authors[0] = msg.sender;
@@ -71,7 +72,7 @@ contract Manifestations is Pausable, Initializable, Evidencable {
     /// @param title The title of the manifestation
     /// @param additionalAuthors The additional authors,
     /// including the one registering that becomes the first author
-    function manifestJointAuthorship(string hash, string title, address[] additionalAuthors)
+    function manifestJointAuthorship(string memory hash, string memory title, address[] memory additionalAuthors)
     public registerIfAvailable(hash, title) whenNotPaused() {
         require(additionalAuthors.length < 64, "Joint authorship limited to 64 authors");
         address[] memory authors = new address[](additionalAuthors.length + 1);
@@ -84,8 +85,8 @@ contract Manifestations is Pausable, Initializable, Evidencable {
     /// @notice Retrieve the title and authors of the manifestation with content hash `hash`.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
     /// @return The title and authors of the manifestation
-    function getManifestation(string hash) public constant
-    returns (string, address[], uint256, uint256) {
+    function getManifestation(string memory hash) public view
+    returns (string memory, address[] memory, uint256, uint256) {
         return (manifestations[hash].title,
                 manifestations[hash].authors,
                 manifestations[hash].time.creationTime,
@@ -94,7 +95,7 @@ contract Manifestations is Pausable, Initializable, Evidencable {
 
     /// @notice Adds an evidence if there is already a manifestation for `hash`.
     /// @param hash Hash of the manifestation content, for instance IPFS Base58 Hash
-    function addEvidence(string hash) public {
+    function addEvidence(string memory hash) public {
         require(bytes(manifestations[hash].title).length > 0, "The manifestation evidenced should exist");
         super.addEvidence(hash);
     }

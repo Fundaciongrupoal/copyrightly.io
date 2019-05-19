@@ -20,9 +20,9 @@ contract('Manifestations - Expirable', function (accounts) {
 
   beforeEach('setup specific contracts for this test with short expiry', async () => {
     shortExpiryManifestations = await Manifestations.new(timeToExpiry);
-    newProxy = await Proxy.new(shortExpiryManifestations.address, {from: PROXYADMIN});
+    newProxy = await Proxy.new(shortExpiryManifestations.address, PROXYADMIN, []);
     manifestations = await Manifestations.at(newProxy.address);
-    manifestations.initialize(OWNER, timeToExpiry);
+    manifestations.initialize(timeToExpiry);
   });
 
   it("should re-register just when already expired", async () => {
@@ -40,7 +40,7 @@ contract('Manifestations - Expirable', function (accounts) {
     try {
       await manifestations.manifestAuthorship(HASH1, TITLE_NEW, {from: MANIFESTER2});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      assert(e.reason, "Already registered and not expired or with evidence");
     }
 
     result = await manifestations.getManifestation(HASH1);
@@ -78,7 +78,7 @@ contract('Manifestations - Expirable', function (accounts) {
     try {
       await manifestations.manifestAuthorship(HASH2, TITLE_NEW, {from: MANIFESTER2});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      assert(e.message, "Already registered and not expired or with evidence");
     }
 
     result = await manifestations.getManifestation(HASH2);

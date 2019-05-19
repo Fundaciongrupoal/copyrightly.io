@@ -2,17 +2,15 @@ const Manifestations = artifacts.require('Manifestations');
 const Proxy = artifacts.require("AdminUpgradeabilityProxy");
 const Complaints = artifacts.require("./Complaints.sol");
 
-const web3 = require('web3');
-
 contract('Complaints - Register complaints', function (accounts) {
 
   const OWNER = accounts[0];
   const PROXYADMIN = accounts[1];
   const MANIFESTER = accounts[2];
   const COMPLAINER = accounts[3];
-  const HASH1 = web3.utils.randomHex(46);
+  const HASH1 = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const TITLE1 = "A nice picture";
-  const HASH2 = web3.utils.randomHex(46);
+  const HASH2 = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnpBDg";
   const TITLE2 = "Unmanifested picture";
   const COMPLAINT_HASH1 = web3.utils.randomHex(46);
   const COMPLAINT_HASH2 = web3.utils.randomHex(46);
@@ -27,10 +25,8 @@ contract('Complaints - Register complaints', function (accounts) {
 
   it("should register a new complaint", async () => {
     await manifestations.manifestAuthorship(HASH1, TITLE1, {from: MANIFESTER});
-
     let eventEmitted = false;
-    const event = complaints.ComplaintEvent();
-    await event.watch((error, result) => {
+    await complaints.ComplaintEvent().on('data', result => {
       complainer = result.args.complainer;
       complaintHash = result.args.complaintHash;
       manifestationHashed = result.args.manifestationHashed;
@@ -41,7 +37,7 @@ contract('Complaints - Register complaints', function (accounts) {
 
     assert.equal(eventEmitted, true,
         'a proper complaint should emit a ComplaintEvent');
-    assert.equal(manifestationHashed, web3.utils.soliditySha3(HASH1),
+    assert.equal(manifestationHashed, web3.utils.sha3(HASH1),
         'unexpected manifestation hashed');
     assert.equal(complaintHash, COMPLAINT_HASH1,
         'unexpected complaint hash');
@@ -51,8 +47,7 @@ contract('Complaints - Register complaints', function (accounts) {
 
   it("shouldn't register a complaint if already one for manifestation", async () => {
     let eventEmitted = false;
-    const event = complaints.ComplaintEvent();
-    await event.watch((error, result) => {
+    await complaints.ComplaintEvent().on('data', result => {
       eventEmitted = true;
     });
 
@@ -68,8 +63,7 @@ contract('Complaints - Register complaints', function (accounts) {
 
   it("shouldn't allow to revoke complaint if not contract owner", async () => {
     let eventEmitted = false;
-    const event = complaints.ComplaintEvent();
-    await event.watch((error, result) => {
+    await complaints.ComplaintEvent().on('data', result => {
       eventEmitted = true;
     });
 
@@ -93,8 +87,7 @@ contract('Complaints - Register complaints', function (accounts) {
 
   it("should allow to revoke complaint if contract owner", async () => {
     let eventEmitted = false;
-    const event = complaints.RevokeComplaintEvent();
-    await event.watch((error, result) => {
+    await complaints.RevokeComplaintEvent().on('data', result => {
       complainer = result.args.complainer;
       complaintHash = result.args.complaintHash;
       manifestationHashed = result.args.manifestationHashed;

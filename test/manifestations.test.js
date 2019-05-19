@@ -9,7 +9,6 @@ contract('Manifestations - Single Authorship', function (accounts) {
   const HASH = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const TITLE = "A nice picture";
 
-  let manifestHash, manifestTitle, manifestManifester;
   let proxy, manifestations;
 
   beforeEach('setup contracts for each test', async () => {
@@ -18,24 +17,16 @@ contract('Manifestations - Single Authorship', function (accounts) {
   });
 
   it("should register a previously unregistered manifestation", async () => {
-    let eventEmitted = false;
-    const event = manifestations.ManifestEvent();
-    await event.watch((error, result) => {
-      manifestHash = result.args.hash;
-      manifestTitle = result.args.title;
-      manifestManifester = result.args.manifester;
-      eventEmitted = true;
-    });
 
-    await manifestations.manifestAuthorship(HASH, TITLE, {from: MANIFESTER});
+    const receipt = await manifestations.manifestAuthorship(HASH, TITLE, {from: MANIFESTER});
 
-    assert.equal(eventEmitted, true,
+    assert.equal(receipt.logs[0].event, 'ManifestEvent',
         'manifesting authorship should emit a ManifestEvent');
-    assert.equal(manifestHash, HASH,
+    assert.equal(receipt.logs[0].args.hash, HASH,
         'unexpected manifest event hash');
-    assert.equal(manifestTitle, TITLE,
+    assert.equal(receipt.logs[0].args.title, TITLE,
         'unexpected manifest event title');
-    assert.equal(manifestManifester, MANIFESTER,
+    assert.equal(receipt.logs[0].args.manifester, MANIFESTER,
         'unexpected manifest event manifester');
   });
 
@@ -51,20 +42,11 @@ contract('Manifestations - Single Authorship', function (accounts) {
   });
 
   it("shouldn't register a previously registered manifestation", async () => {
-    let eventEmitted = false;
-    const event = manifestations.ManifestEvent();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
-
     try {
       await manifestations.manifestAuthorship(HASH, TITLE, {from: MANIFESTER});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      assert(e.reason, "Already registered and not expired or with evidence");
     }
-
-    assert.equal(eventEmitted, false,
-        'manifesting a previously registered hash shouldn\'t emit a ManifestEvent');
   });
 });
 
@@ -77,7 +59,6 @@ contract('Manifestations - Joint Authorship', function (accounts) {
   const HASH = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const TITLE = "A nice picture";
 
-  let manifestHash, manifestTitle, manifestAuthors, manifestManifester;
   let proxy, manifestations;
 
   beforeEach('setup contracts for each test', async () => {
@@ -86,25 +67,17 @@ contract('Manifestations - Joint Authorship', function (accounts) {
   });
 
   it("should register joint authorship for unregistered manifestation", async () => {
-    let eventEmitted = false;
-    const event = manifestations.ManifestEvent();
-    await event.watch((error, result) => {
-      manifestHash = result.args.hash;
-      manifestTitle = result.args.title;
-      manifestManifester = result.args.manifester;
-      eventEmitted = true;
-    });
 
-    await manifestations.manifestJointAuthorship(
+    const receipt = await manifestations.manifestJointAuthorship(
       HASH, TITLE, ADDITIONAL_AUTHORS, {from: MANIFESTER});
 
-    assert.equal(eventEmitted, true,
+    assert.equal(receipt.logs[0].event, 'ManifestEvent',
       'manifesting authorship should emit a ManifestEvent');
-    assert.equal(manifestHash, HASH,
+    assert.equal(receipt.logs[0].args.hash, HASH,
       'unexpected manifest event hash');
-    assert.equal(manifestTitle, TITLE,
+    assert.equal(receipt.logs[0].args.title, TITLE,
       'unexpected manifest event title');
-    assert.equal(manifestManifester, MANIFESTER,
+    assert.equal(receipt.logs[0].args.manifester, MANIFESTER,
       'unexpected manifest event manifester');
   });
 
@@ -126,20 +99,11 @@ contract('Manifestations - Joint Authorship', function (accounts) {
   });
 
   it("shouldn't register a previously registered joint authorship manifestation", async () => {
-    let eventEmitted = false;
-    const event = manifestations.ManifestEvent();
-    await event.watch(() => {
-      eventEmitted = true;
-    });
-
     try {
       await manifestations.manifestJointAuthorship(
         HASH, TITLE, ADDITIONAL_AUTHORS, {from: MANIFESTER});
     } catch(e) {
-      assert(e.message, "Error: VM Exception while processing transaction: revert");
+      assert(e.reason, "Already registered and not expired or with evidence");
     }
-
-    assert.equal(eventEmitted, false,
-      'manifesting a previously registered hash shouldn\'t emit a ManifestEvent');
   });
 });

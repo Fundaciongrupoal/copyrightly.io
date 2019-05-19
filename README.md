@@ -27,7 +27,7 @@ content is also available on YouTube.
 
 Future work:
  - Register YouTubeEvidences from the user interface.
- - Make it possible to register [Complaints](contracts/Complaints.v.py) from the user interface, if someone else has registered content we own. Currently, the
+ - Make it possible to register [Complaints](contracts/Complaints.sol) from the user interface, if someone else has registered content we own. Currently, the
  contract is implemented but its functionality is not available from the Web client.
  - Evidences can be also added to **Complaints**.
  - Implement a **[Token Curated Registry](https://medium.com/@tokencuratedregistry/a-simple-overview-of-token-curated-registries-84e2b7b19a06) (TCR)** 
@@ -267,6 +267,7 @@ This behavior is required to make *Manifestations* upgradable and inherited by e
 ```
   Contract: Manifestations - Upgradeability
     ✓ should keep stored manifestations after upgrade (151ms)
+    ✓ shouldn't allow upgrade if called by non-admin (84ms)
     ✓ shouldn't work when called by admin through proxy for security
     ✓ should fail when trying to re-initialize it
 ```
@@ -316,7 +317,7 @@ then can add evidence as usual.
 
 ### Complaints Contract
 
-Source: [Complaints.v.py](contracts/Complaints.v.py)
+Source: [Complaints.v.py](contracts/Complaints.sol)
 
 This contract has been implemented using **Vyper** as detailed in the [LLL / Vyper](#lll--vyper) Section. It is 
 responsible for registering complaints from accounts that consider that the existing manifestations is not a 
@@ -442,7 +443,7 @@ Thus, the Oracle allows a creator to assert that a manifestation is also availab
 the same person, who should have access to edit the description of the video to include the link to the manifestation
 using its hash.
 
-The tests for this contract are possible in the Ganache test network are possible using the 
+The tests for this contract are possible in the Ganache test network using the 
 [ethereum-bridge](https://github.com/oraclize/ethereum-bridge) as recommended in the Oraclize documentation. 
 The tests are available from [youtubeevidences.test.js](test/youtubeevidences.test.js)
 
@@ -472,13 +473,17 @@ Consequently, this account cannot be used to register manifestations. A "revert"
 
 ### LLL / Vyper
 
-A version of the *Complaints* contract has been also implemented using Vyper. The result is [Complaints.vy](contracts/Complaints.v.py), which was
-first validated and compiled using the [Vyper Online Compiler](https://vyper.online/)
+A version of the *Complaints* contract has been also implemented using Vyper. 
+The result is [Complaints.vy](https://github.com/rogargon/copyrightly.io/blob/ConsensysAcademy2018/contracts/Complaints.v.py), 
+which was first validated and compiled using the [Vyper Online Compiler](https://vyper.online/)
 
 To integrate Vyper with Truffle, the Vyper compiler must be installed first as detailed 
 [here](https://vyper.readthedocs.io/en/latest/installing-vyper.html). Then, the project already installs the tool 
 [truper](https://www.npmjs.com/package/truper) as part of its NPM development dependencies) that makes possible to use 
 the following command to compile the Vyper contract and generate a Truffle compatible artifact:
+
+NOTE: the last version of the application has ported this contract to Solidity. The Vyper version is available from the
+branch corresponding to the [Consensys Academy 2018 submission](https://github.com/rogargon/copyrightly.io/tree/ConsensysAcademy2018/)
 
 ```
 npm run vyper
