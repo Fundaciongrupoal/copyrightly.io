@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21 <0.6.0;
+pragma solidity 0.5.2;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -15,7 +15,6 @@ contract TestManifestations {
 
     // Testing that manifest authorship of single author works
     function testSingleAuthorRegistered() public {
-        address expectedAuthor = msg.sender;
         string memory title;
         address[] memory authors;
         uint256 time;
@@ -25,7 +24,6 @@ contract TestManifestations {
         (title, authors, time, expiry) = manifestations.getManifestation(HASH1);
 
         Assert.equal(title, TITLE, "The title of manifestation should match the registered one");
-        // Assert.equal(authors[0], expectedAuthor, "First author should be the expected one");
         Assert.equal(authors.length, 1, "There should be just one author");
         Assert.equal(time, now, "Manifest time should be now");
     }
@@ -36,7 +34,6 @@ contract TestManifestations {
         ADDITIONAL_AUTHORS[0] = address(0x1);
         ADDITIONAL_AUTHORS[0] = address(0x2);
         ADDITIONAL_AUTHORS[0] = address(0x3);
-        address firstAuthor = msg.sender;
         string memory title;
         address[] memory authors;
         uint256 time;
@@ -47,7 +44,6 @@ contract TestManifestations {
 
         Assert.equal(title, TITLE, "The title of manifestation should match the registered one");
         Assert.equal(authors.length, 4, "There should 4 authors");
-        // Assert.equal(authors[0], firstAuthor, "First author should be the expected one");
         Assert.equal(authors[1], ADDITIONAL_AUTHORS[0], "Second author should be the expected one");
         Assert.equal(authors[2], ADDITIONAL_AUTHORS[1], "Third author should be the expected one");
         Assert.equal(authors[3], ADDITIONAL_AUTHORS[2], "Fourth author should be the expected one");
@@ -57,7 +53,6 @@ contract TestManifestations {
     // Testing that manifest joint authorship with 0 additional authors works
     function testSingleAuthorThroughJointAuthorRegistered() public {
         address[] memory ADDITIONAL_AUTHORS = new address[](0);
-        address firstAuthor = msg.sender;
         string memory title;
         address[] memory authors;
         uint256 time;
@@ -68,7 +63,6 @@ contract TestManifestations {
 
         Assert.equal(title, TITLE, "The title of manifestation should match the registered one");
         Assert.equal(authors.length, 1, "There should 4 authors");
-        // Assert.equal(authors[0], firstAuthor, "First author should be the expected one");
         Assert.equal(time, now, "Manifest time should be now");
     }
 

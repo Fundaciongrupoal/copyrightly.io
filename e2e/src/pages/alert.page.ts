@@ -9,12 +9,12 @@ export class AlertPage {
   }
 
   async getLastAlertMessage(): Promise<string> {
-    const lastAlert = this.alerts.all(by.css('div.alert')).first();
+    const lastAlert = this.alerts.all(by.css('.alert')).first();
     browser.wait(ExpectedConditions.presenceOf(lastAlert));
     return await lastAlert.getText();
   }
 
   async closeLastAlert() {
-    await this.alerts.all(by.css('div.alert')).first().element(by.css('button.close')).click();
+    await this.alerts.all(by.css('.alert')).first().element(by.css('button.close')).click();
   }
 }

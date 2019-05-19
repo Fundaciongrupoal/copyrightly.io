@@ -1,5 +1,5 @@
 language: node_js
-node_js: '10'
+node_js: '11'
 sudo: required
 services:
   - docker
@@ -30,14 +30,14 @@ before_script:
   - export CHROME_BIN=chromium-browser
 
 script:
-  - npm run lint
+  - npm run lint || travis_terminate 1
   - npm run network > /dev/null &
   - while ! nc -z localhost 8545; do sleep 5; done
   - npm run ethereum-bridge > /dev/null &
   - sleep 30
+  - npm run soltest || travis_terminate 1
   - npm run migrate
-  - npm run soltest
-  - npm run e2e
+  - npm run e2e || travis_terminate 1
   - npm run migrate -- --network ropsten
   - npm run build
 

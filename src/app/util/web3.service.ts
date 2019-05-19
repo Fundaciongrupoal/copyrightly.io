@@ -3,10 +3,11 @@ import { Observable } from 'rxjs/internal/Observable';
 import { Connect } from 'uport-connect';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import Web3 from 'web3';
+// import Web3 from 'web3';
 
 declare let require: any;
 declare let window: any;
+const Web3 = require('web3');
 const TRUFFLE_CONFIG = require('../../../truffle');
 
 @Injectable({
