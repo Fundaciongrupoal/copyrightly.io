@@ -13,6 +13,7 @@ import { YouTubeEvidenceComponent } from './create/youtube-evidence.component';
 import { YouTubeEvidenceEventComponent } from './youtube-evidence-event.component';
 import { YouTubeEvidenceDetailsComponent } from './details/youtube-evidence-details.component';
 import { YouTubeEvidencesContractService } from './youtube-evidences-contract.service';
+import { OraclizeQueryEventComponent } from './oraclize-query-event.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { YouTubeEvidencesContractService } from './youtube-evidences-contract.se
     YouTubeEvidenceComponent,
     YouTubeEvidenceEventComponent,
     YouTubeEvidenceDetailsComponent,
+    OraclizeQueryEventComponent
   ],
   imports: [
     CommonModule,
@@ -41,6 +43,6 @@ import { YouTubeEvidencesContractService } from './youtube-evidences-contract.se
     UploadEvidencesContractService,
     YouTubeEvidencesContractService
   ],
-  bootstrap: [ UploadEvidenceEventComponent, YouTubeEvidenceEventComponent ]
+  bootstrap: [ UploadEvidenceEventComponent, YouTubeEvidenceEventComponent, OraclizeQueryEventComponent ]
 })
 export class EvidencesModule { }

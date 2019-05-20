@@ -16,6 +16,7 @@ const proxy = require('../../assets/contracts/AdminUpgradeabilityProxy.json');
 export class ManifestationsContractService {
 
   private deployedContract = new ReplaySubject<any>(1);
+  private watching = true; // Default try to watch events
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
@@ -68,6 +69,17 @@ export class ManifestationsContractService {
         .send({from: account, gas: 150000})
         .on('transactionHash', hash =>
           this.ngZone.run(() => observer.next(hash)))
+        .on('receipt', receipt => {
+          const manifestEvent = new ManifestEvent(receipt.events.ManifestEvent);
+          this.web3Service.getBlockDate(receipt.events.ManifestEvent.blockNumber)
+          .subscribe(date => {
+            this.ngZone.run(() => {
+              manifestEvent.when = date;
+              if (!this.watching) { observer.next(manifestEvent); } // If not watching, show event
+              observer.complete();
+            });
+          });
+        })
         .on('error', error => {
           console.error(error);
           this.ngZone.run(() => {
@@ -75,32 +87,6 @@ export class ManifestationsContractService {
             observer.complete();
           });
         });
-      }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
-      return { unsubscribe() {} };
-    });
-  }
-
-  public watchManifestEvents(account: string): Observable<Event> {
-    return new Observable((observer) => {
-      this.deployedContract.subscribe(contract => {
-        contract.events.ManifestEvent({ filter: { manifester: account }, fromBlock: 'latest' },
-          (error, event) => {
-            if (error) {
-              console.log(error);
-              this.ngZone.run(() => {
-                observer.error(new Error('Error listening to contract events, see log for details'));
-              });
-            } else {
-              const manifestEvent = new ManifestEvent(event);
-              this.web3Service.getBlockDate(event.blockNumber)
-              .subscribe(date => {
-                this.ngZone.run(() => {
-                  manifestEvent.when = date;
-                  observer.next(manifestEvent);
-                });
-              });
-            }
-          });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });
@@ -154,6 +140,32 @@ export class ManifestationsContractService {
             observer.complete();
           });
         });
+      }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
+      return { unsubscribe() {} };
+    });
+  }
+
+  public watchManifestEvents(account: string): Observable<Event> {
+    return new Observable((observer) => {
+      this.deployedContract.subscribe(contract => {
+        contract.events.ManifestEvent({ filter: { manifester: account }, fromBlock: 'latest' },
+          (error, event) => {
+            if (error) {
+              this.watching = false; // Not possible to watch for events
+              this.ngZone.run(() => {
+                observer.error(new Error(error.toString()));
+              });
+            } else {
+              const manifestEvent = new ManifestEvent(event);
+              this.web3Service.getBlockDate(event.blockNumber)
+              .subscribe(date => {
+                this.ngZone.run(() => {
+                  manifestEvent.when = date;
+                  observer.next(manifestEvent);
+                });
+              });
+            }
+          });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });

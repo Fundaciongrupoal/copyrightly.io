@@ -8,6 +8,7 @@ import { NgForm } from '@angular/forms';
 import { UploadEvidenceEventComponent } from '../upload-evidence-event.component';
 import { UploadEvidence } from '../uploadEvidence';
 import { Manifestation } from '../../manifestations/manifestation';
+import { ManifestEventComponent } from '../../manifestations/manifest-event.component';
 
 @Component({
   selector: 'app-upload-evidence',
@@ -62,6 +63,9 @@ export class UploadEvidenceComponent implements OnInit {
             'Receipt: <a target="_blank" href="https://ropsten.etherscan.io/tx/' + result + '">' + result + '</a>');
           form.reset();
           this.done.emit();
+        } else {
+          console.log(result);
+          this.alertsService.modal(UploadEvidenceEventComponent, result);
         }
       }, error => {
         this.alertsService.error(error);

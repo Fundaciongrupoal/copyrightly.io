@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
         console.log(event);
         this.alertsService.modal(ManifestEventComponent, event);
       }, error => {
-        this.alertsService.error(error);
+       console.log(error.toString());
       });
   }
 
@@ -59,7 +59,7 @@ export class AppComponent implements OnInit, OnDestroy {
         console.log(event);
         this.alertsService.modal(YouTubeEvidenceEventComponent, event);
       }, error => {
-        this.alertsService.error(error);
+        console.log(error.toString());
       });
   }
 
@@ -71,7 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
         console.log(event);
         this.alertsService.modal(UploadEvidenceEventComponent, event);
       }, error => {
-        this.alertsService.error(error);
+        console.log(error.toString());
       });
   }
 

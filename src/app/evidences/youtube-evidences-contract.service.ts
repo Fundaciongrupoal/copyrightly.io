@@ -5,7 +5,7 @@ import { ReplaySubject } from 'rxjs';
 import { YouTubeEvidence } from './youtubeEvidence';
 import { YouTubeEvidenceEvent } from './youtube-evidence-event';
 import { Event } from '../util/event';
-import { ManifestEvent } from '../manifestations/manifest-event';
+import { OraclizeQueryEvent } from './oraclize-query-event';
 
 declare const require: any;
 const evidences = require('../../assets/contracts/YouTubeEvidences.json');
@@ -19,6 +19,7 @@ export class YouTubeEvidencesContractService {
 
   private deployedContract = new ReplaySubject<any>(1);
   private manifestationsAddress: string;
+  private watching = true; // Default try to watch events
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
@@ -35,16 +36,27 @@ export class YouTubeEvidencesContractService {
     });
   }
 
-  public addEvidence(evidence: YouTubeEvidence, account: string, price: number): Observable<string> {
+  public addEvidence(evidence: YouTubeEvidence, account: string,
+                     price: number): Observable<string | OraclizeQueryEvent> {
     return new Observable((observer) => {
       this.deployedContract.subscribe(contract => {
-        contract.methods.check(this.manifestationsAddress, evidence.evidencedId, evidence.videoId, this.ORACLIZE_GASLIMIT)
+        contract.methods.check(this.manifestationsAddress, evidence.evidencedId, evidence.videoId,
+          this.ORACLIZE_GASLIMIT)
         .send({from: account, gas: 320000, value: this.web3Service.web3.utils.toWei(price)})
         .on('transactionHash', hash =>
-          this.ngZone.run(() => {
-            observer.next(hash);
-            observer.complete();
-          }))
+          this.ngZone.run(() => observer.next(hash) ))
+        .on('receipt', receipt => {
+          const evidenceEvent = new OraclizeQueryEvent(receipt.events.OraclizeQuery);
+          this.web3Service.getBlockDate(receipt.events.OraclizeQuery.blockNumber)
+          .subscribe(date => {
+            this.ngZone.run(() => {
+              evidenceEvent.when = date;
+              evidenceEvent.watching = this.watching;
+              observer.next(evidenceEvent);
+              observer.complete();
+            });
+          });
+        })
         .on('error', error => {
           console.error(error);
           this.ngZone.run(() => {
@@ -83,32 +95,6 @@ export class YouTubeEvidencesContractService {
               observer.complete();
             }
         });
-      }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
-      return { unsubscribe() {} };
-    });
-  }
-
-  public watchEvidenceEvents(account: string): Observable<Event> {
-    return new Observable((observer) => {
-      this.deployedContract.subscribe(contract => {
-        contract.events.YouTubeEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' },
-          (error, event) => {
-            if (error) {
-              console.log(error);
-              this.ngZone.run(() => {
-                observer.error(new Error('Error listening to YouTube evidence events, see log for details'));
-              });
-            } else {
-              const evidenceEvent = new YouTubeEvidenceEvent(event);
-              this.web3Service.getBlockDate(event.blockNumber)
-              .subscribe(date => {
-                this.ngZone.run(() => {
-                  evidenceEvent.when = date;
-                  observer.next(evidenceEvent);
-                });
-              });
-            }
-          });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });
@@ -156,6 +142,32 @@ export class YouTubeEvidencesContractService {
             observer.complete();
           });
         });
+      }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
+      return { unsubscribe() {} };
+    });
+  }
+
+  public watchEvidenceEvents(account: string): Observable<Event> {
+    return new Observable((observer) => {
+      this.deployedContract.subscribe(contract => {
+        contract.events.YouTubeEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' },
+          (error, event) => {
+            if (error) {
+              this.watching = false;
+              this.ngZone.run(() => {
+                observer.error(new Error(error.toString()));
+              });
+            } else {
+              const evidenceEvent = new YouTubeEvidenceEvent(event);
+              this.web3Service.getBlockDate(event.blockNumber)
+              .subscribe(date => {
+                this.ngZone.run(() => {
+                  evidenceEvent.when = date;
+                  observer.next(evidenceEvent);
+                });
+              });
+            }
+          });
       }, error => this.ngZone.run(() => { observer.error(error); observer.complete(); }));
       return { unsubscribe() {} };
     });

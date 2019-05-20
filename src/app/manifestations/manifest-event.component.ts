@@ -35,7 +35,7 @@ import { Router } from '@angular/router';
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-info" (click)="details()">Details</button>
+      <button type="button" ngbAutofocus class="btn btn-info" (click)="details()">Details</button>
     </div>
   `,
   styles: ['.modal-body { font-size: smaller; }']

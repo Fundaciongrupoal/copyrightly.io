@@ -1,13 +1,13 @@
 Ropsten:
- - Manifestations: 0xbb25860e0bc165cc7c4f487fa406f3f310d146e7
- - AdminUpgradeabilityProxy: 0x82d9b9268bf23d60aed1f6877c150a9b4f280b68
- - UploadEvidences: 0xb78f2f829ee4a326c4d8e39b2e584c3b37d8840c
- - YouTubeEvidences: 0x79d314ac3c5ccb2b08586486a4c2ed376db65cf2
- - Complaints: 0x7F970854749356A996F9d868FFEc3c3E90e7c17E
+ - Manifestations: 0x204476e67c1d0D7aEAc3944099e19362cDF5f515
+ - AdminUpgradeabilityProxy: 0x21f198D24E1F61FE28186453Acf2863323ff1e1A
+ - UploadEvidences: 0x6F04032a1D480AA729D51894DcaE94F2B23533fc
+ - YouTubeEvidences: 0x331862238dB2C8692886aFb3cC5a431e4Cd8dfa5
+ - Complaints: 0xb22a8Dcd445ab993Adb17e3DAd15c732C28573B3
 
 Rinkeby:
- - Manifestations: 0x2a381e3292b586af5524c18563d64d3a9472be8c
- - AdminUpgradeabilityProxy: 0x2e0b75e8f64d4cced51bf4503a81ef59b0a939b7
- - UploadEvidences: 0x1f29de05682da24495a82c63e7a1750e2a86479c
- - YouTubeEvidences: 0x1e4857f4867a8ba2597d4a82612d7a31b8817c19
- - Complaints: 0x74c31e5c62d3469f0962741b96bcad0ace1f3a25
+ - Manifestations: 0x48587a914839e1d6B7842A72f9d0D32fB2C3ccD1
+ - AdminUpgradeabilityProxy: 0xAAC0689Fc05DD6A2a16bDc037ca2f77F86e9ACCD
+ - UploadEvidences: 0x3ff4551199caE91d6B1f83c6a57eC519B0c912d1
+ - YouTubeEvidences: 0x8e3aDFAc75d1B4145C440544EE31A1e195ABA921
+ - Complaints: 0x8c62DCDB68DdCc2E5A03f7041c9D9956F8F38Ae1

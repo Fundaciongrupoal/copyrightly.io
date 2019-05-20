@@ -5,6 +5,7 @@ import { ReplaySubject } from 'rxjs';
 import { UploadEvidence } from './uploadEvidence';
 import { UploadEvidenceEvent } from './upload-evidence-event';
 import { Event } from '../util/event';
+import { ManifestEvent } from '../manifestations/manifest-event';
 
 declare const require: any;
 const evidences = require('../../assets/contracts/UploadEvidences.json');
@@ -17,6 +18,7 @@ export class UploadEvidencesContractService {
 
   private deployedContract = new ReplaySubject<any>(1);
   private manifestationsAddress: string;
+  private watching = true; // Default try to watch events
 
   constructor(private web3Service: Web3Service,
               private ngZone: NgZone) {
@@ -60,12 +62,20 @@ export class UploadEvidencesContractService {
       this.deployedContract.subscribe(contract => {
         contract.methods.addEvidence(this.manifestationsAddress, evidence.evidencedHash, evidence.evidenceHash)
         .send({from: account, gas: 150000})
-        .once('transactionHash', hash =>
-          this.ngZone.run(() => {
-            observer.next(hash);
-            observer.complete();
-          }))
-        .once('error', error => {
+        .on('transactionHash', hash =>
+          this.ngZone.run(() => observer.next(hash) ))
+        .on('receipt', receipt => {
+          const evidenceEvent = new UploadEvidenceEvent(receipt.events.UploadEvidenceEvent);
+          this.web3Service.getBlockDate(receipt.events.UploadEvidenceEvent.blockNumber)
+          .subscribe(date => {
+            this.ngZone.run(() => {
+              evidenceEvent.when = date;
+              if (!this.watching) { observer.next(evidenceEvent); } // If not watching, show event
+              observer.complete();
+            });
+          });
+        })
+        .on('error', error => {
           console.error(error);
           this.ngZone.run(() => {
             observer.error(new Error('Error registering evidence, see log for details'));
@@ -112,9 +122,9 @@ export class UploadEvidencesContractService {
         contract.events.UploadEvidenceEvent({ filter: { evidencer: account }, fromBlock: 'latest' },
           (error, event) => {
             if (error) {
-              console.log(error);
+              this.watching = false; // Not possible to watch for events
               this.ngZone.run(() => {
-                observer.error(new Error('Error listening to YouTube evidence events, see log for details'));
+                observer.error(new Error(error.toString()));
               });
             } else {
               const evidenceEvent = new UploadEvidenceEvent(event);
