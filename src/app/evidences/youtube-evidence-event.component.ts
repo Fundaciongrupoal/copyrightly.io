@@ -46,7 +46,7 @@ import { YouTubeEvidenceEvent } from './youtube-evidence-event';
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-info" (click)="details()">Manifestation Details</button>
+      <button type="button" ngbAutofocus class="btn btn-info" (click)="details()">Manifestation Details</button>
     </div>
   `,
   styles: ['.modal-body { font-size: smaller; }']

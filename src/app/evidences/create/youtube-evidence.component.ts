@@ -7,6 +7,9 @@ import { YouTubeEvidencesContractService } from '../youtube-evidences-contract.s
 import { NgForm } from '@angular/forms';
 import { YouTubeEvidence } from '../youtubeEvidence';
 import { Manifestation } from '../../manifestations/manifestation';
+import { ManifestEventComponent } from '../../manifestations/manifest-event.component';
+import { OraclizeQueryEvent } from '../oraclize-query-event';
+import { OraclizeQueryEventComponent } from '../oraclize-query-event.component';
 
 @Component({
   selector: 'app-youtube-evidence',
@@ -41,11 +44,16 @@ export class YouTubeEvidenceComponent implements OnInit {
   addEvidence(form: NgForm) {
     this.youtubeEvidencesContractService.addEvidence(this.youtubeEvidence, this.account, this.price)
     .subscribe(result => {
-      console.log('Transaction hash: ' + result);
-      this.alertsService.info('Evidence submitted, you will be alerted when confirmed.<br>' +
-        'Receipt: <a target="_blank" href="https://ropsten.etherscan.io/tx/' + result + '">' + result + '</a>');
-      form.reset();
-      this.done.emit();
+      if (typeof result === 'string') {
+        console.log('Transaction hash: ' + result);
+        this.alertsService.info('Evidence submitted, you will be alerted when confirmed.<br>' +
+          'Receipt: <a target="_blank" href="https://ropsten.etherscan.io/tx/' + result + '">' + result + '</a>');
+        form.reset();
+        this.done.emit();
+      } else {
+        console.log(result);
+        this.alertsService.modal(OraclizeQueryEventComponent, result);
+      }
     }, error => {
       this.alertsService.error(error);
     });

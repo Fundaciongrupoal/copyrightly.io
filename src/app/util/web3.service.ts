@@ -16,42 +16,39 @@ const TRUFFLE_CONFIG = require('../../../truffle');
 export class Web3Service {
   public useWebSockets = true; // TODO: Disable to improve interoperability with current tools
   public web3: any;
-  public  networkId = new ReplaySubject<any>(1);
-
+  public networkId = new ReplaySubject<any>(1);
   private connect: Connect;
-  private uPortNetwork = 'rinkeby';
-  private uPortAppName = 'copyrightly.io';
 
   constructor(private ngZone: NgZone) {
-    if (typeof window.web3 === 'undefined') {
-      // Default, use local network defined by Truffle config if none provided
-      if (this.useWebSockets) {
-        const localNode = 'ws://' + TRUFFLE_CONFIG.networks.development.host + ':' +
-          TRUFFLE_CONFIG.networks.development.port;
-        console.log('Using Web3 for local node: ' + localNode);
-        this.web3 = new Web3(new Web3.providers.WebsocketProvider(localNode));
-      } else {
-        const localNode = 'http://' + TRUFFLE_CONFIG.networks.development.host + ':' +
-          TRUFFLE_CONFIG.networks.development.port;
-        console.log('Using Web3 for local node: ' + localNode);
-        this.web3 = new Web3(new Web3.providers.HttpProvider(localNode));
-        // Hack to provide backwards compatibility for Truffle, which uses web3js 0.20.x
-        // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
-      }
+    if (window.ethereum) {
+      this.web3 = new Web3(window.ethereum);
+    } else if (window.web3) {
+      this.web3 = new Web3(window.web3.currentProvider);
     } else {
-      if (window.ethereum) {
-        this.web3 = new Web3(window.ethereum);
-      } else if (window.web3) {
-        this.web3 = new Web3(window.web3.currentProvider);
-      } else {
-        this.connect = new Connect(this.uPortAppName,
-          { network: this.uPortNetwork, accountType: 'general' });
-        this.web3 = new Web3(this.connect.getProvider());
+      if (TRUFFLE_CONFIG) { // Use local network defined by Truffle config
+        if (this.useWebSockets) {
+          const localNode = 'ws://' + TRUFFLE_CONFIG.networks.development.host + ':' +
+            TRUFFLE_CONFIG.networks.development.port;
+          console.log('Using Web3 for local node: ' + localNode);
+          this.web3 = new Web3(new Web3.providers.WebsocketProvider(localNode));
+        } else {
+          const localNode = 'http://' + TRUFFLE_CONFIG.networks.development.host + ':' +
+            TRUFFLE_CONFIG.networks.development.port;
+          console.log('Using Web3 for local node: ' + localNode);
+          this.web3 = new Web3(new Web3.providers.HttpProvider(localNode));
+          // Hack to provide backwards compatibility for Truffle, which uses web3js 0.20.x
+          // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
+        }
       }
     }
     this.web3.eth.net.getId()
       .then(networkId => {
         this.networkId.next(networkId);
+      })
+      .catch( () => { // Last resort is to use uPort
+        this.connect = new Connect('copyrightly.io', {network: 'rinkeby', accountType: 'general'});
+        this.web3 = new Web3(this.connect.getProvider());
+        this.networkId.next(this.web3.utils.hexToNumber(this.connect.network.id));
       });
   }
 
