@@ -9,23 +9,19 @@ module.exports = async function(deployer, network, accounts) {
   const proxyAdmin = accounts[1];
   const timeToExpiry = 60 * 60 * 24;  // 24h
 
-  deployer.then(async () => {
-    await deployer.deploy(SafeMath);
-    await deployer.link(SafeMath, [ExpirableLib, Manifestations]);
-    await deployer.deploy(ExpirableLib);
-    await deployer.link(ExpirableLib, [Manifestations]);
-    await deployer.deploy(Manifestations, timeToExpiry);
-    await deployer.deploy(Proxy, Manifestations.address, proxyAdmin, []);
-    await deployer.deploy(UploadEvidences);
+  await deployer.deploy(SafeMath);
+  await deployer.link(SafeMath, [ExpirableLib, Manifestations]);
+  await deployer.deploy(ExpirableLib);
+  await deployer.link(ExpirableLib, [Manifestations]);
+  await deployer.deploy(Manifestations, timeToExpiry);
+  await deployer.deploy(Proxy, Manifestations.address, proxyAdmin, []);
+  await deployer.deploy(UploadEvidences);
 
-    const manifestations = await Manifestations.deployed();
-    const proxy = await Proxy.deployed();
-    const uploadEvidences = await UploadEvidences.deployed();
-    const proxied = await Manifestations.at(proxy.address);
+  const manifestations = await Manifestations.deployed();
+  const proxy = await Proxy.deployed();
+  const uploadEvidences = await UploadEvidences.deployed();
+  const proxied = await Manifestations.at(proxy.address);
 
-    return Promise.all([
-      await proxied.initialize(timeToExpiry),
-      await proxied.addEvidenceProvider(uploadEvidences.address),
-    ]);
-  });
+  await proxied.initialize(timeToExpiry);
+  await proxied.addEvidenceProvider(uploadEvidences.address);
 };
