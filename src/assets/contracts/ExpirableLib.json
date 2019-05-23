@@ -38,7 +38,7 @@
         "id": 266,
         "nodeType": "ImportDirective",
         "scope": 318,
-        "sourceUnit": 7691,
+        "sourceUnit": 7689,
         "src": "34:59:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -63,10 +63,10 @@
               "id": 267,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7690,
+              "referencedDeclaration": 7688,
               "src": "237:8:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$7690",
+                "typeIdentifier": "t_contract$_SafeMath_$7688",
                 "typeString": "library SafeMath"
               }
             },
@@ -283,7 +283,7 @@
                             "name": "now",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 8227,
+                            "referencedDeclaration": 8225,
                             "src": "686:3:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
@@ -455,7 +455,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 8227,
+                      "referencedDeclaration": 8225,
                       "src": "1093:3:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -541,7 +541,7 @@
                           "name": "now",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 8227,
+                          "referencedDeclaration": 8225,
                           "src": "1124:3:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
@@ -555,7 +555,7 @@
                         "lValueRequested": false,
                         "memberName": "add",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 7669,
+                        "referencedDeclaration": 7667,
                         "src": "1124:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -705,7 +705,7 @@
         "id": 266,
         "nodeType": "ImportDirective",
         "scope": 318,
-        "sourceUnit": 7691,
+        "sourceUnit": 7689,
         "src": "34:59:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -730,10 +730,10 @@
               "id": 267,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7690,
+              "referencedDeclaration": 7688,
               "src": "237:8:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$7690",
+                "typeIdentifier": "t_contract$_SafeMath_$7688",
                 "typeString": "library SafeMath"
               }
             },
@@ -950,7 +950,7 @@
                             "name": "now",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 8227,
+                            "referencedDeclaration": 8225,
                             "src": "686:3:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
@@ -1122,7 +1122,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 8227,
+                      "referencedDeclaration": 8225,
                       "src": "1093:3:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -1208,7 +1208,7 @@
                           "name": "now",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 8227,
+                          "referencedDeclaration": 8225,
                           "src": "1124:3:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
@@ -1222,7 +1222,7 @@
                         "lValueRequested": false,
                         "memberName": "add",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 7669,
+                        "referencedDeclaration": 7667,
                         "src": "1124:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1359,21 +1359,15 @@
       "address": "0x7EfC4C6D049E05A7684583045C4937F5F6Dc5aA9",
       "transactionHash": "0xf3ea6d96562b6a688ae11c97f5266ea59e0f4b32ed6b1258a4619f0c42c8b64e"
     },
-    "82584648528": {
-      "events": {},
-      "links": {},
-      "address": "0x4a64FCEC5D36D6bE98EbC57080D5d8DBF706b382",
-      "transactionHash": "0x8a2a3f7d6603817d52ebfc3a91fce7d1f8231fc4b354abf724d4aaf882ddbc96"
-    },
     "83584648538": {
       "events": {},
       "links": {},
-      "address": "0x925280bce3D97079E435a1648CE50da599F3E536",
-      "transactionHash": "0x8ec858b7bbb41ec90211d63f4934000820759cbcf721ca7c8aa2279038646e1c"
+      "address": "0x406C7EADa2404e675F790893F4F8271c65306572",
+      "transactionHash": "0x2f821445e3712e278afeaf2f76ca3b3c8ac3cb2cd7a94a7766505225f963a690"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-17T17:03:07.284Z",
+  "updatedAt": "2019-05-23T09:32:34.355Z",
   "devdoc": {
     "author": "Roberto García (http://rhizomik.net/~roberto/)",
     "methods": {},

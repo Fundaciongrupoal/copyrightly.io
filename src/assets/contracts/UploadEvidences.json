@@ -2203,21 +2203,15 @@
       "address": "0x3ff4551199caE91d6B1f83c6a57eC519B0c912d1",
       "transactionHash": "0xb994f80141cf8ef61256571e44e05a3872f4fc1738a3fb8157cb4c3814f1806b"
     },
-    "82584648528": {
-      "events": {},
-      "links": {},
-      "address": "0x0B54F119feE958C61A02c8486dCf67ea31Dd6d3f",
-      "transactionHash": "0x004056910566e11ec97307d3bd6675547122c099cce8cb5866b9a912d7829df0"
-    },
     "83584648538": {
       "events": {},
       "links": {},
-      "address": "0x0D2b245f334e5E943418Eb4421f10b2056541477",
-      "transactionHash": "0xd9d3a5bd36d0f3111b999b73332427a9dd0457a9edae096f220f447df0965772"
+      "address": "0x7a9546935BE5cb2318C8AD4C2Ab1Bcbe3FaB908B",
+      "transactionHash": "0x54fcdc7bd41d931111b692635a09c34042d98599ac9bfd88ad04acdeafba6e0e"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-17T17:03:07.291Z",
+  "updatedAt": "2019-05-23T09:32:34.366Z",
   "devdoc": {
     "author": "Roberto García (http://rhizomik.net/~roberto/)",
     "methods": {

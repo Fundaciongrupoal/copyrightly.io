@@ -46,14 +46,17 @@ module.exports = {
       gas: 3000000,
       gasPrice: 5000000000 // 5 Gwei
     },
-    quorum: {
-      provider: () => new HDWalletProvider(process.env.MNEMONIC,
-        process.env.NODE_RPC_URL, 0, 2),
-      network_id: "*",
+    telsius: {
+      // provider: () => new HDWalletProvider(process.env.MNEMONIC,
+      //    process.env.NODE_RPC_URL, 0, 2),
+      host: process.env.NODE_RPC_HOST, // without 'http://', e.g. HOST_IP/rpc
+      port: process.env.NODE_RPC_PORT, // 80 if through nginx proxy
+      from: process.env.NODE_RPC_FROM, // previously unlocked account in node
+      network_id: 83584648538,
       gasPrice: 0,
       gas: 4500000,
       type: "quorum"
-    }
+    },
   },
   // Configure your compilers
   compilers: {
