@@ -1,11 +1,11 @@
 import {TestBed, inject} from '@angular/core/testing';
-import Web3 from 'web3';
-
 import {Web3Service} from './web3.service';
+// import Web3 from 'web3';
 
-const TRUFFLE_CONFIG = require('../../../truffle');
-
+declare let require: any;
 declare let window: any;
+const Web3 = require('web3');
+const TRUFFLE_CONFIG = require('../../../truffle');
 
 describe('Web3Service', () => {
   beforeEach(() => {
