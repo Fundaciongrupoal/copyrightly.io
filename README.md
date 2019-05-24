@@ -1,8 +1,14 @@
 # CopyrightLY.io
 
-Decentralized Application (ÐApp) for Copyright Management
+Decentralized Application (ÐApp) for Copyright Management 
 
 [![Build Status](https://travis-ci.org/rogargon/copyrightly.io.svg?branch=master)](https://travis-ci.org/rogargon/copyrightly.io)
+
+
+> Note: project originally developed to fulfil the 
+[Consensys Academy 2018 Developer Program](https://courses.consensys.net/courses/course-v1:ConsenSysAcademy+2018DP+1/about) online course. 
+The focus was on learning and showcasing a wide range of techniques and technologies (*IPFS*, *ENS*, *Oracles*, *Upgradeability*,...) and not
+on providing a complete product. The project helped getting the top qualification for that cohort: ``114.8 of 120 points``.
 
 CopyrightLY smart contracts allow content owners to register their works as what is called a 
 [Manifestation](https://github.com/rhizomik/copyrightonto/tree/master/ActionsModel#overview), as modelled in the 
@@ -11,7 +17,7 @@ CopyrightLY smart contracts allow content owners to register their works as what
 **Manifestations** are expressions of authors ideas into pieces of content that can be then used to prove authorship.
 This is done through the [Manifestations](contracts/Manifestations.sol) contract, which records
 the IPFS hash of the manifestation content, its title (additional metadata is planned) and when it was manifested. 
-This information can be later used to proof authorship as the content can be retrieved from IPFS.
+This information can be later used to prove authorship as the content can be retrieved from IPFS.
 
 However, it is not enough to register a **Manifestation**. **Evidences** should be also provided to support the
 authorship claim or the **Manifestation** will expire after one day. Usually done by the author registering the
@@ -21,7 +27,7 @@ There are **Evidences** based on content uploaded (to IPFS), implemented by the
 [UploadEvidences](contracts/UploadEvidences.sol) contract. The uploaded content can be anything, 
 from a screenshot to a scanned contract in PDF format.
 
-The are also **Evidences** based on having previously published the content online, for instance in YouTube.
+There are also **Evidences** based on having previously published the content online, for instance in YouTube.
 The [YouTubeEvidences](contracts/YouTubeEvidences.sol) contract allows claiming that a video **Manifestation** 
 content is also available on YouTube.
 
@@ -32,9 +38,9 @@ Future work:
  - Evidences can be also added to **Complaints**.
  - Implement a **[Token Curated Registry](https://medium.com/@tokencuratedregistry/a-simple-overview-of-token-curated-registries-84e2b7b19a06) (TCR)** 
  of **Evidences** supporting **Manifestations** and **Complaints**. 
- To add an evidence, an amount of the **CLY token** has to be **staked**.
- Moreover, anyone (the curators) can also mint some CLY and stake it to support an evidence, with the opportunity of winning additional
- CLY if they support an evidence of a winning manifestation or claim... but the risk of loosing it otherwise.
+ To add evidence, an amount of the **CLY token** has to be **staked**.
+ Moreover, anyone (the curators) can also mint some CLY and stake it to support a piece of evidence, with the opportunity of winning additional
+ CLY if they support evidence of a winning manifestation or claim... but the risk of losing it otherwise.
 
 ## Table of Contents
    
@@ -120,9 +126,6 @@ cd copyrightly.io
 
 npm install
 
-node patch.js
-
-npm run ethpm
 ```
 
 ### Smart Contracts Deployment
@@ -140,7 +143,15 @@ These accounts are fixed using the seed:
 
     candy maple cake sugar pudding cream honey rich smooth crumble sweet treat
 
-Then, deploy the contracts from a different terminal (leave Ganache running on the previous one):
+To be able to deploy the [YouTubeEvidences](contracts/YouTubeEvidences.sol) contract that make use of oracles,
+as detailed in [Oracles](#oracles) section, it is also necessary to deploy the Oraclize Ethereum Bridge on the
+local network using the following command from a separate terminal:
+
+```
+npm run ethereum-bridge
+```
+
+Finally, deploy the contracts from another terminal (leaving Ganache and the bridge running on the previous ones):
 
 ```
 npm run migrate
@@ -213,7 +224,7 @@ pieces of content that can be then used to prove authorship. A manifestation is 
 some metadata (currently just the title) and the address of the account corresponding to its
 author (or a list of addresses in the case of joint authorship).
 
-There are 4 Solidity Tests that test the fundamental behavior of the contract: that the contract
+There are 4 Solidity Tests that test the fundamental behaviour of the contract: that the contract
 can register single and joint authorship (multiple authors for the same manifestation), that registering 
 joint authorship providing just one author is equivalent to stating single authorship, and, finally, 
 that the contract fails if and already registered content hash is used.
@@ -244,7 +255,7 @@ retrieved.
     ✓ shouldn't register a previously registered joint authorship manifestation
 ```
 
-Then, there are tests for the behaviors inherited from the contracts extended by *Manifestations*. 
+Then, there are tests for the behaviours inherited from the contracts extended by *Manifestations*. 
 
 From OpenZeppelin's *Pausable* and *Ownable*, that the contract can be paused and resumed, but just
 by the contract owner.
@@ -261,7 +272,7 @@ From ZeppelinOS' *AdminUpgradeabilityProxy*, that *Manifestations* is upgradable
 an upgrade by the proxy admin. Then, that the proxy admin cannot use the proxy to call the proxied *Manifestations* 
 contract, required for security reasons. Finally, that *Manifestations* cannot be re-initialized 
 (it has been already initialized during the initial deployment migration). 
-This behavior is required to make *Manifestations* upgradable and inherited by extending *Initializable*.
+This behaviour is required to make *Manifestations* upgradable and inherited by extending *Initializable*.
 
 [manifestations_upgradeability.test.js](test/manifestations_upgradeability.test.js)
 ```
@@ -273,13 +284,13 @@ This behavior is required to make *Manifestations* upgradable and inherited by e
 ```
 
 Finally, the *Manifestations* contract uses the *ExpirableLib* library and extends the *Evidencable* contract, 
-both detailed in specific subsection below. 
+both detailed in a specific subsection below. 
 
-*ExpirableLib* makes it possible to overwrite manifestations that have not received any authorship evidence before 
-an expiry time. The following tests validate that a manifestation can be re-registered after it has expired, 
+*ExpirableLib* makes it possible to overwrite manifestations that have not received any authorship evidence before an 
+expiry time. The following tests validate that a manifestation can be re-registered after it has expired, 
 but only if it hasn't received any authorship evidence. 
 
-To do so, a new version of the Manifestations contract just for testing is deployed with a time to expiry of just 2 seconds. 
+To do so, a new version of the Manifestations contract just for testing is deployed with a "time to expiry" of just 2 seconds. 
 The tests check that re-registration is possible just after more than 2 seconds, but just if no evidence has been added.
 
 [manifestations_expirable.test.js](test/manifestations_expirable.test.js)
@@ -293,9 +304,9 @@ The tests check that re-registration is possible just after more than 2 seconds,
 
 Source: [UploadEvidences.sol](contracts/UploadEvidences.sol)
 
-This contract implements the registration of evidence based on uploading content to IPFS. It behaves as an
+This contract implements the registration of evidence-based on uploading content to IPFS. It behaves as an
 evidence provider for the contract specified when adding the evidence. However, the contract has to be registered
-as and allowed evidence provider, in the case of these tests in the *Manifestations* contract.
+as an allowed evidence provider, in the case of these tests in the *Manifestations* contract.
 
 Multiple evidence should be accumulated for the same manifestation, but just if they are new ones and if the
 manifestation they are evidence for exists. Finally, only the owner of *Manifestations* can register
@@ -309,7 +320,7 @@ then can add evidence as usual.
     ✓ should add multiple evidence for the same manifestation (124ms)
     ✓ shouldn't add the same evidence for the same manifestation (116ms)
     ✓ shouldn't add the same evidence for a different manifestation (142ms)
-    ✓ shouldn't add evidence if the manifestation does not exists (522ms)
+    ✓ shouldn't add evidence if the manifestation does not exist (522ms)
     ✓ shouldn't add evidence if not a registered evidence provider (556ms)
     ✓ should be enforced that just the owner registers evidence providers (558ms)
 
@@ -317,13 +328,13 @@ then can add evidence as usual.
 
 ### Complaints Contract
 
-Source: [Complaints.v.py](contracts/Complaints.sol)
+Source: [Complaints.sol](contracts/Complaints.sol)
 
-This contract has been implemented using **Vyper** as detailed in the [LLL / Vyper](#lll--vyper) Section. It is 
-responsible for registering complaints from accounts that consider that the existing manifestations is not a 
-proper one, i.e. coming from the right creator. 
+This contract was initially implemented using **Vyper** as detailed in the [LLL / Vyper](#lll--vyper) Section. 
+Currently, it uses Solidity as the rest of contracts. It is responsible for registering complaints from accounts 
+that consider that an existing manifestation is not a proper one, i.e. coming from the right creator. 
 
-The corresponding tests verify that just one complaint for a given manifestation is allowed at the same
+The corresponding tests verify that just one complaint about a given manifestation is allowed at the same
 time. It is also checked that complaints can be revoked just by the contract owner. 
 Finally, just existing and non-revoked complaints can be retrieved.
 
@@ -332,9 +343,9 @@ Finally, just existing and non-revoked complaints can be retrieved.
   Contract: Complaints - Register complaints
     ✓ should register a new complaint (160ms)
     ✓ shouldn't register a complaint if already one for manifestation
-    ✓ shouldn't allow to revoke complaint if not contract owner
+    ✓ shouldn't allow revoking complaint if not contract owner
     ✓ should retrieve an existing complaint
-    ✓ should allow to revoke complaint if contract owner (46ms)
+    ✓ should allow revoking complaint if contract owner (46ms)
     ✓ shouldn't allow retrieving a revoked complaint
     ✓ shouldn't allow retrieving an unexisting complaint
 ```
@@ -344,7 +355,7 @@ Finally, just existing and non-revoked complaints can be retrieved.
 Source: [ExpirableLib.sol](contracts/ExpirableLib.sol)
 
 This library contains the logic for items with a creation and expiry time. With it, 
-manifestations (or complaints) can expire after a certain amount of time. It is testedf or **Manifestations** in: 
+manifestations (or complaints) can expire after a certain amount of time. It is tested for **Manifestations** in: 
 [manifestations_expirable.test.js](test/manifestations_expirable.test.js)
 
 ### Evidencable Contract
@@ -368,9 +379,8 @@ as tested for **Manifestations** in: [manifestations_expirable.test.js](test/man
 
 ## Library / EthPM
 
-The project imports the following Libraries and Contracts from ZeppelinOs and OpenZeppelin. 
-In both cases, they where imported as Node packages using NPM because the versions available 
-trough EthPM are outdated.
+The project imports the following Libraries and Contracts from the corresponding ZeppelinOs and OpenZeppelin 
+NPM packages.
 
 Imported from ZeppelinOS:
  - *AdminUpgradeabilityProxy*: the proxy contract to implement upgradeability.
@@ -381,10 +391,14 @@ Imported from OpenZeppelin:
  It also extends *Ownable* to control that just the owner can stop it.
  - *SafeMath*: library that avoids the integer overflow and underflow issue.
 
-Moreover, the OraclizeAPI package has been imported using EthPM as defined in [ethpm.json](ethpm.json). 
-From this package, the following contract has been used:
+Moreover, the OraclizeAPI package has been imported from the corresponding NPM package, concretely the 
+following contract:
  - *usingOraclize*: implements the oracle used by YouTubeEvidences to check that a YouTube video is owned 
  by a particular user and linked to its manifestation.
+
+> NOTE: previous versions of the project imported Oraclize using EthPM as specified in 
+[ethpm.json](https://github.com/rogargon/copyrightly.io/blob/ConsensysAcademy2018/ethpm.json). 
+However, switched to NPM because more up to date versions are available now using this tool.
 
 ## Additional Requirements
 
@@ -405,7 +419,7 @@ recommended to keep the same exact file they used to generate the hash.
 
 The same is done for evidence based on uploading content to IPFS, that then becomes available for inspection.
 
-In both cases the user interface provide links to IPFS to retrieve the uploaded content.
+In both cases, the user interface provides links to IPFS to retrieve the uploaded content.
 
 ### uPort
 
@@ -439,7 +453,7 @@ An oracle has been used in the [YouTubeEvidences](contracts/YouTubeEvidences.sol
 This contract implements an Oracle that checks if a specific YouTube video, identified using its VIDEO_ID, has
 in the description of its web page (https://www.youtube.com/watch?v=VIDEO_ID) a link to a specific content hash.
 
-Thus, the Oracle allows a creator to assert that a manifestation is also available in YouTube as a video owned by
+Thus, the Oracle allows a creator to assert that a manifestation is also available on YouTube as a video owned by
 the same person, who should have access to edit the description of the video to include the link to the manifestation
 using its hash.
 
@@ -489,7 +503,7 @@ branch corresponding to the [Consensys Academy 2018 submission](https://github.c
 npm run vyper
 ```
 
-For the moment, truper just generates the artifacts in "build/contracts" so it should be moved to "src/assets/contracts".
+For the moment, Truper just generates the artifacts in "build/contracts" so it should be moved to "src/assets/contracts".
 This is the folder configured in [truffle.js](truffle.js) as the destination for Truffle artifacts so they are deployed with the
 Angular frontend. Moreover, it should be renamed "Complaints.json" instead of the original "Complaints.vyper.json", as it seems Truffle
 expects it with that name.
