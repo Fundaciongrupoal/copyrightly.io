@@ -14,7 +14,7 @@ const TRUFFLE_CONFIG = require('../../../truffle');
   providedIn: 'root'
 })
 export class Web3Service {
-  public useWebSockets = true; // TODO: Disable to improve interoperability with current tools
+  public useWebSockets = true;
   public web3: any;
   public networkId = new ReplaySubject<any>(1);
   private connect: Connect;
@@ -36,8 +36,6 @@ export class Web3Service {
             TRUFFLE_CONFIG.networks.development.port;
           console.log('Using Web3 for local node: ' + localNode);
           this.web3 = new Web3(new Web3.providers.HttpProvider(localNode));
-          // Hack to provide backwards compatibility for Truffle, which uses web3js 0.20.x
-          // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
         }
       }
     }
@@ -59,6 +57,7 @@ export class Web3Service {
         case 2: return 'Morden';
         case 3: return 'Ropsten';
         case 4: return 'Rinkeby';
+        case 83584648538: return 'Telsius';
         default: return 'LocalNet';
       }
     }));

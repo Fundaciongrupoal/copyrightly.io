@@ -354,6 +354,11 @@ contract usingOraclize {
       oraclize_setNetworkName("eth_goerli");
       return true;
     }
+    if (getCodeSize(0x4eBA0c76b9463812622874Fa56CC7a78ddA1B0c5) > 0) { //telsius
+      OAR = OraclizeAddrResolverI(0x4eBA0c76b9463812622874Fa56CC7a78ddA1B0c5);
+      oraclize_setNetworkName("telsius");
+      return true;
+    }
     if (getCodeSize(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475) > 0) { //ethereum-bridge
       OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
       return true;

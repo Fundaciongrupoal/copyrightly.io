@@ -3,7 +3,9 @@ const Proxy = artifacts.require("./AdminUpgradeabilityProxy.sol");
 const YouTubeEvidences = artifacts.require("./YouTubeEvidences.sol");
 
 module.exports = async function(deployer, network, accounts) {
-  const customGasPrice = 10000000000; // 10 GWei
+  let customGasPrice = 10000000000; // 10 GWei
+  if (network === "telsius" )
+    customGasPrice = 0;
 
   await deployer.deploy(YouTubeEvidences, customGasPrice);
 

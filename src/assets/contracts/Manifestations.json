@@ -8667,12 +8667,6 @@
       "address": "0x48587a914839e1d6B7842A72f9d0D32fB2C3ccD1",
       "transactionHash": "0x14501df416319135a266f11a1e65aa1c3d39e247f8b13c6915fa3255b5d104a0"
     },
-    "82584648528": {
-      "events": {},
-      "links": {},
-      "address": "0x030117071a5283E46b1B7aB73Fa2E29e3890058a",
-      "transactionHash": "0x905ccb2a5e80eefcb200b9575bddc841743edf5ae08916823d9f9964658c5070"
-    },
     "83584648538": {
       "events": {
         "0x9221287e8a14b313bd740c10367708dd71a6bd842aaf2848fbee7d4fb4ca329c": {
@@ -8783,12 +8777,12 @@
         }
       },
       "links": {},
-      "address": "0xED3862253f0967e51A958132f5D051879F2fa7F5",
-      "transactionHash": "0x13523a285e59c1480d22a10ec1406de08c1c4aac9f17ba7df38a6a8619f7e04f"
+      "address": "0x1Ed1F3a24D917149482Fe6917253EEcC447A28B6",
+      "transactionHash": "0x13f7798a5574396092aaa4f538b8e92d78e3e6f8ffc5e7279acca31d562759cb"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-17T17:06:09.972Z",
+  "updatedAt": "2019-05-23T16:01:39.035Z",
   "devdoc": {
     "author": "Roberto García (http://rhizomik.net/~roberto/)",
     "methods": {
