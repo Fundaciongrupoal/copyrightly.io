@@ -18,12 +18,7 @@ cd alastria-node/docker/general/alastria-access-point
 ./reload-config.sh nginx
 ```
 
-To check if the IP has been added to the whitelist, check the file 
-`alastria-node/docker/general/alastria-access-point/nginx/conf.d`.
-This file is mapped to the access point container so you can also directly edit it and then trigger 
-nginx reload using the `reload-config.sh`
-
-Finally, to check if the proxy is working properly, you can take a look at the nginx logs. 
+To check if the proxy is working properly, you can take a look at the nginx logs. 
 First, get a shell inside the the container:
 
 ```bash
@@ -81,7 +76,7 @@ Then, it is possible to trigger the deployment of the contracts to the Telsius n
 npm run migrate -- telsius
 ```
 
-### Manually Testing Deployed Contracts
+### Testing Deployed Contracts
 
 To test the contracts, once deployed, open the Truffle console on Telsius:
 
@@ -95,3 +90,19 @@ And then, from inside the console, call one of the deployed contract methods, fo
 truffle(telsius)> migrations = await Migrations.deployed()
 truffle(telsius)> (await migrations.last_completed_migration()).toString()
 ```
+
+## Configuring MetaMask
+
+To interact with the deployed contracts from a browser, you can use the [MetaMask](https://metamask.io/)
+extension. Once installed and configured, it is necessary to add Telsius as one of the available networks 
+to interact with contracts deployed there. 
+
+To add Telsius, click the currently selected network (usually `Main Ethereum Network`) and click
+`Custom RPC` instead. Then, provide the details about the new network:
+
+* Network Name: Telsius
+* New RPC URL: http://NODE_IP/rpc
+* ChainID: 83584648538
+
+Once the configuration is saved, the new network can be selected to interact with it. 
+The **IP** from where the **browser** is interacting should be **in the Alastria Access Point whitelist**.
