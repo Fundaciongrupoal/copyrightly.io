@@ -131,15 +131,8 @@ export class YouTubeEvidencesContractService {
         .then(result => {
           this.ngZone.run(() => {
             const price = this.web3Service.web3.utils.fromWei(result.toString());
-            this.web3Service.getNetworkName().subscribe(network => {
-              if (network === 'Telsius') {
-                observer.next(this.web3Service.web3.utils.fromWei('0'));
-                observer.complete();
-              } else {
-                observer.next(price);
-                observer.complete();
-              }
-            });
+            observer.next(price);
+            observer.complete();
           });
         })
         .catch(error => {
