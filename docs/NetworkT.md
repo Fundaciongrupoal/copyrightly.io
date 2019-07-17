@@ -1,11 +1,11 @@
-# Deploying to Alastria's network Telsius (Quorum)
+# Deploying to Alastria's Network T (Quorum)
 
-Considering that there is available a regular Telsius node, which can be deployed as indicated in 
+Considering that there is available a regular Network T node, which can be deployed as indicated in 
 https://medium.com/babel-go2chain/setting-in-motion-a-regular-node-in-the-telsius-network-of-alastria-c2d67b8369c7
 
 ## Configuring Alastria Access Point
 
-The Telsius regular node is exposed through a proxy available from `http://NODE_IP/rpc`. This proxy, 
+The Network T regular node is exposed through a proxy available from `http://NODE_IP/rpc`. This proxy, 
 the Alastria Access Point, filters incoming request to just the 
 "eth", "net" and "web3" types. Moreover, it blocks all requests from sources not in its whitelist. 
 
@@ -44,7 +44,7 @@ The deployment account is specified in `truffle.js`, together with the rest of t
 about the network, as follows:
 
 ```yaml
-    telsius: {
+    networkt: {
       host: NODE_IP/rpc,
       port: 80,
       from: "0x123456789abcdef123456789abcdef123456789a",
@@ -70,37 +70,37 @@ personal.unlockAccount(personal.listAccounts[0], "password", 300)
 
 > If there are no accounts in the target node, create one from the geth console using `personal.newAccount`
 
-Then, it is possible to trigger the deployment of the contracts to the Telsius network:
+Then, it is possible to trigger the deployment of the contracts to the Network T:
 
 ```bash
-npm run migrate -- telsius
+npm run migrate -- networkt
 ```
 
 ### Testing Deployed Contracts
 
-To test the contracts, once deployed, open the Truffle console on Telsius:
+To test the contracts, once deployed, open the Truffle console on Network T:
 
 ```bash
-truffle console --network telsius
+truffle console --network networkt
 ```
 
 And then, from inside the console, call one of the deployed contract methods, for instance:
 
 ```
-truffle(telsius)> migrations = await Migrations.deployed()
-truffle(telsius)> (await migrations.last_completed_migration()).toString()
+truffle(networkt)> migrations = await Migrations.deployed()
+truffle(networkt)> (await migrations.last_completed_migration()).toString()
 ```
 
 ## Configuring MetaMask
 
 To interact with the deployed contracts from a browser, you can use the [MetaMask](https://metamask.io/)
-extension. Once installed and configured, it is necessary to add Telsius as one of the available networks 
+extension. Once installed and configured, it is necessary to add Network T as one of the available networks 
 to interact with contracts deployed there. 
 
-To add Telsius, click the currently selected network (usually `Main Ethereum Network`) and click
+To add Network T, click the currently selected network (usually `Main Ethereum Network`) and click
 `Custom RPC` instead. Then, provide the details about the new network:
 
-* Network Name: Telsius
+* Network Name: Network T
 * New RPC URL: http://NODE_IP/rpc
 * ChainID: 83584648538
 
