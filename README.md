@@ -1,6 +1,7 @@
 # CopyrightLY.io
 
-Decentralized Application (ÐApp) for Copyright Management 
+Decentralized Application (ÐApp) for Copyright Management
+(available on Ethereum's testnets *Rinkeby* and *Ropsten* through https://copyrightly.io)
 
 [![Build Status](https://travis-ci.org/rogargon/copyrightly.io.svg?branch=master)](https://travis-ci.org/rogargon/copyrightly.io)
 
