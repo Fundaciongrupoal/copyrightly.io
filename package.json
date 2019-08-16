@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "ÐApp for Copyright Management",
   "scripts": {
-    "postinstall": "npm-run-all -p -c patch-webpack patch-bnjs",
+    "postinstall": "npm-run-all -p -c patch-webpack patch-bnjs && cd ./node_modules/protractor && npm i webdriver-manager@latest && cd ../.. && ./node_modules/.bin/webdriver-manager update",
     "patch-webpack": "node patch.js",
     "patch-bnjs": "node patch-BN.js",
     "lint": "npm-run-all -p -c solhint nglint",
