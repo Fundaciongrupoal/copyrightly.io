@@ -1,6 +1,8 @@
-# Deploying to Alastria's Network T (Quorum)
+# Deploying a DApp Project to Alastria's Network T (Quorum)
 
-Considering that there is available a regular Network T node, which can be deployed as indicated in 
+This repository includes a complete Decentralized Application (DApp) as detailed in its [README](../README.md), which includes features like **Automated Testing**, **IPFS**, **ENS**, **Oracles**, **Contract Upgradeability**, **uPort** or an **Angular** frontend. 
+
+It has been deployed to Network T (Quorum) as detailed next anc considering that there is an available Network T regular node, which can be deployed as indicated in 
 https://medium.com/babel-go2chain/setting-in-motion-a-regular-node-in-the-telsius-network-of-alastria-c2d67b8369c7
 
 ## Configuring Alastria Access Point
@@ -29,7 +31,6 @@ Then, monitor the log of the access point nginx proxy to check if access is bein
 
 ```bash
 tail -f /var/log/nginx/access.log
-
 ```
 
 ## Contract Deployment
