@@ -21,10 +21,10 @@ cd alastria-node/docker/general/alastria-access-point
 ```
 
 To check if the proxy is working properly, you can take a look at the nginx logs. 
-First, get a shell inside the the container:
+First, get a shell inside the the container, where you can use `sudo docker container list -q` to get the CONTAINER_ID:
 
 ```bash
-sudo docker exec -it <CONTAINER_ID> /bin/bash
+sudo docker exec -it CONTAINER_ID /bin/bash
 ```
 
 Then, monitor the log of the access point nginx proxy to check if access is being granted: 
@@ -60,7 +60,7 @@ The account used as `from` should be then unlocked before the deployment is trig
 To unlock the account temporarily, attach to the node from the machine where the node is running:
 
 ```bash
-sudo docker exec -it <CONTAINER_ID> geth attach http://localhost:22000
+sudo docker exec -it CONTAINER_ID geth attach http://localhost:22000
 ```
 
 Then, unlock the first account, for instance during 300 seconds (5 minutes):
