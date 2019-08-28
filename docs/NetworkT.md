@@ -99,11 +99,17 @@ extension. Once installed and configured, it is necessary to add Network T as on
 to interact with contracts deployed there. 
 
 To add Network T, click the currently selected network (usually `Main Ethereum Network`) and click
-`Custom RPC` instead. Then, provide the details about the new network:
+`Custom RPC` instead. Then, provide the details about the new network, at least:
 
 * Network Name: Network T
 * New RPC URL: http://NODE_IP/rpc
 * ChainID: 83584648538
+
+ChainID should be the same ID than the Network T ID, `83584648538`, to avoid issues with MetaMask implementation of EIP 155, which requires that both IDs are identical for security reasons. Additionally, a block explorer can be added to make it easier to explore transactions directly from links in MetaMask (though you will need to replace "tx" with "transaction" because the explorer uses a different URL template than MetaMask):
+
+<p align="center">
+  <img alt="NetworkT configuration for MetaMask" src="NetworkT-MetaMask.png" width="250"/>
+</p>
 
 Once the configuration is saved, the new network can be selected to interact with it. 
 The **IP** from where the **browser** is interacting should be **in the Alastria Access Point whitelist**.
